@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Define las rutas del API
-app.use('/solicitud', require('./routes/solicitud.routes'));
+app.use('/saag', require('./routes/solicitud.routes'));
 
 // Sincroniza la base de datos
 db.sequelize.sync().then(() => {
