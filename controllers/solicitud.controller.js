@@ -1,6 +1,6 @@
 const db = require('../models');
 const Solicitud = db.solicitud;
-
+//prueba
 // Crea una nueva solicitud
 exports.create = (req, res) => {
   // Verifica si la solicitud tiene una descripción
