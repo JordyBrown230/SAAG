@@ -5,9 +5,7 @@ const sequelize = new Sequelize('acib', 'root', '', {
     define: {
         freezeTableName: true// para que no agruegue la S tipo solicitud's', al crear el schema en la db xd.
       }
-  });
-  
-
+  });  
 const db = {};
 
 db.Sequelize = Sequelize;
