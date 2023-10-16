@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -11,6 +12,7 @@ app.use(cors());
 
 // Define las rutas del API
 app.use('/saag', require('./routes/solicitud.routes'));
+app.use('/saag', require('./routes/ausencia.routes'));
 
 // Sincroniza la base de datos
 db.sequelize.sync().then(() => {
@@ -18,3 +20,5 @@ db.sequelize.sync().then(() => {
     console.log(`Servidor iniciado en el puerto ${PORT}`);
   });
 });
+
+module.exports = app;

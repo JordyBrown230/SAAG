@@ -9,10 +9,6 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.DATE,
             allowNull: false
         },
-        fechaInicio: {
-            type: Sequelize.DATE,
-            allowNull: true
-        },
         fechaFin: {
             type: Sequelize.DATE,
             allowNull: true
