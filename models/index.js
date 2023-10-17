@@ -11,9 +11,9 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
+db.colaborador = require('./colaborador')(sequelize, Sequelize);
 db.solicitud = require('./solicitud')(sequelize, Sequelize);
-db.usuario = require('./usuario')(sequelize, Sequelize);
+db.usuario = require('./usuarios')(sequelize, Sequelize);
 db.ausencia = require('./ausencia')(sequelize, Sequelize);
-
 
 module.exports = db;

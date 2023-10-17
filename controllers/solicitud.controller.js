@@ -1,21 +1,19 @@
 const db = require('../models');
 const Solicitud = db.solicitud;
+const Colaborador = db.colaborador; // Import the Colaborador model if not already imported
 
 // Crea una nueva solicitud
 exports.create = (req, res) => {
   // Verifica si la solicitud tiene una descripción
-  if (!req.body.descripcion) {
+  if (req.body.length==0) {
     res.status(400).send({
-      message: 'La descripción no puede estar vacía'
+      message: 'No puede venir sin datos'
     });
     return;
   }
-  // Crea una nueva solicitud
-  const solicitud = {
-    descripcion: req.body.descripcion
-  };
 
-  // Guarda la solicitud en la base de datos
+  const solicitud=req.body;
+  // Crea una nueva solicitud
   Solicitud.create(solicitud)
     .then(data => {
       res.send(data);
@@ -29,7 +27,6 @@ exports.create = (req, res) => {
 };
 
 
-// Obtiene todas las solicitudes
 exports.findAll = (req, res) => {
   Solicitud.findAll()
     .then(data => {
@@ -99,7 +96,6 @@ exports.update = (req, res) => {
     });
 };
 
-// Elimina una solicitud por ID
 exports.delete = (req, res) => {
   const id = req.params.id;
 
@@ -132,3 +128,27 @@ exports.delete = (req, res) => {
       });
     });
 };
+
+exports.getAllSolicitudesPorColaborador = (req, res) => {
+  const colaboradorId = req.params.id;
+
+  Solicitud.findAll({
+    where: { idColaborador: colaboradorId },
+    include: [{ model: Colaborador, as: 'colaborador' }],
+  })
+    .then(data => {
+      if (data.length === 0) {
+        res.status(404).send({
+          message: 'No se encontraron solicitudes para este colaborador',
+        });
+      } else {
+        res.send(data);
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || 'Ocurrió un error al obtener las solicitudes del colaborador.',
+      });
+    });
+};
+

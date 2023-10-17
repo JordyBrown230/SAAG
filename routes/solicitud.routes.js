@@ -17,4 +17,7 @@ router.put('/solicitud/:id', solicitudController.update);
 // Elimina una solicitud por ID
 router.delete('/solicitud/:id', solicitudController.delete);
 
+router.get('/solicitudesporcolaborador/:id',solicitudController.getAllSolicitudesPorColaborador);
+
+
 module.exports = router;
