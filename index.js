@@ -13,6 +13,7 @@ app.use(cors());
 // Define las rutas del API
 app.use('/saag', require('./routes/solicitud.routes'));
 app.use('/saag', require('./routes/ausencia.routes'));
+app.use('/saag', require('./routes/usuario.routes'));
 
 // Sincroniza la base de datos
 db.sequelize.sync().then(() => {

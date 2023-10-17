@@ -2,15 +2,13 @@ const db = require('../models');
 const Usuario = db.usuarios;
 
 exports.create = (req, res) =>{
-    if(!req.body.descripcion){
+    const usuario = req.body;
+    if(!req.body){
     res.status(400).send({
         message: 'Los datos del usuario no pueden estar vacios'
     });
     return;
     }
-    const usuario = {
-        descripcion: req.body.descripcion
-    };
     Usuario.create(usuario)
     .then(data => {
         res.send(data);
@@ -22,7 +20,6 @@ exports.create = (req, res) =>{
         });
     });
 };
-
     exports.findAll = (req, res ) => {
         Usuario.findAll()
         .then(data => {
@@ -56,15 +53,15 @@ exports.create = (req, res) =>{
     };
 
     exports.update = (req, res) => {
-        const cedulaId = req.params.cedulaId;
-    Usuario.findByPk(cedulaId)
+        const id = req.params.id;
+    Usuario.findByPk(id)
     .then(usuario => {
         if(!usuario){
         res.status(404).send({
-            message: `No se ha encontado ningun usuario con el numero de cedula ${cedulaId}`
+            message: `No se ha encontado ningun usuario con el numero de cedula ${id}`
         });
     } else {
-        usuario.descripcion = req.body.descripcion
+        usuario = req.body
         usuario.save()
         .then(()=>{
             res.send(usuario);
@@ -72,7 +69,7 @@ exports.create = (req, res) =>{
         .catch(err => {
             res.status(500).send({
                 message:
-                err.message || `Ha ocurrido un error al actualizar los datos del usuario con el numero de cedula: ${cedulaId}`
+                err.message || `Ha ocurrido un error al actualizar los datos del usuario con el numero de cedula: ${id}`
             });
         });
     }
@@ -80,19 +77,18 @@ exports.create = (req, res) =>{
     .catch(err => {
         res.status(500),send({
             message:
-            err.message || `Ha ocurrido un error al obtener los datos del usuario con la cedula: ${cedulaId}`
+            err.message || `Ha ocurrido un error al obtener los datos del usuario con la cedula: ${id}`
         });
     });
 };
 
 exports.delete = (req, res) => {
-    const cedulaId = req.params.cedulaId;
-
-    Usuario.findByPk(cedulaId)
+    const id = req.params.id;
+    Usuario.findByPk(id)
     .then(usuario => {
         if(!usuario){
         res.status(404).send({
-            message: `No se encontro ningun usuario con la cedula ${cedulaId}`
+            message: `No se encontro ningun usuario con la cedula ${id}`
         });
     } else {
         usuario.destroy()
@@ -104,14 +100,14 @@ exports.delete = (req, res) => {
         .catch(err =>{
             res.status(500).send({
                 message:
-                err.message || `Ha ocurrido un error al eliminar los datos del usuario con la cedula ${cedulaId}`
+                err.message || `Ha ocurrido un error al eliminar los datos del usuario con la cedula ${id}`
             })
         })
     }
     })
     .catch(err =>{
         res.status(500).send({
-            message: `Ha ocurrido un error al obtener los datos del usuario con la cedula ${cedulaId}`
+            message: `Ha ocurrido un error al obtener los datos del usuario con la cedula ${id}`
         });
     });
 };
