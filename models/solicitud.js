@@ -1,74 +1,87 @@
 module.exports = (sequelize, Sequelize) => {
-    const Solicitud = sequelize.define('Solicitud', {
-         idSolicitud: {
-            type: Sequelize.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-            allowNull: false
-          },
-          tipoSolicitud: {
-            type: Sequelize.STRING(45),
-            allowNull: false
-          },
-          asunto: {
-            type: Sequelize.STRING(45),
-            allowNull: false
-          },
-          fechaSolicitud: {
-            type: Sequelize.STRING(45),
-            allowNull: false
-          },
-          fechaInicio: {
-            type: Sequelize.DATE,
-            allowNull: true
-          },
-          fechaFin: {
-            type: Sequelize.DATE,
-            allowNull: true
-          },
-          sustituto: {
-            type: Sequelize.STRING(45),
-            allowNull: true
-          },
-          tiempo: {
-            type: Sequelize.TIME,
-            allowNull: true
-          },
-          estado: {
-              type: Sequelize.STRING(90),
-              allowNull: true
-          },
-          comentario: {
-              type: Sequelize.STRING(250),
-              allowNull: true
-          },
-          idColaborador: {
-              type: Sequelize.INTEGER,
-              allowNull: false,
-              references: {
-                  model: 'Colaborador',
-                  key: 'idColaborador'
-              }
-          },
-          idEncargado: {
-              type:  Sequelize.INTEGER,
-              allowNull : true,
-              references : {
-                  model: 'Colaborador',
-                  key: 'idColaborador'
-              }
-          }
-      }, {
-          tableName: 'Solicitud',
-          timestamps: false
-      });
-  
-      Solicitud.associate = (models) => {
-          Solicitud.belongsTo(models.Colaborador, {
-              foreignKey: 'idColaborador',
-              as: 'colaborador'
-          });
-      };
-    return Solicitud;
+  const Solicitud = sequelize.define(
+    "Solicitud",
+    {
+      idSolicitud: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
+      conGoceSalarial: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+      tipoSolicitud: {
+        //vacaciones o licencia
+        type: Sequelize.STRING(15),
+        allowNull: false,
+      },
+      asunto: {
+        type: Sequelize.STRING(45),
+        allowNull: true, //comentario de parte del colaborador
+      },
+      nombreColaborador: {
+        type: Sequelize.STRING(45),
+        allowNull: false,
+      },
+      nombreEncargado: {
+        type: Sequelize.STRING(45), //encargado de revisar solicitud
+        allowNull: true,
+      },
+      fechaSolicitud: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      fechaInicio: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      fechaFin: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      //en caso de ser por horas
+      horaInicio: {
+        type: Sequelize.TIME,
+        allowNull: true,
+      },
+      horaFin: {
+        type: Sequelize.TIME,
+        allowNull: true,
+      },
+      sustitucion: {
+        //se requiere o no? SI/NO
+        type: Sequelize.STRING(4),
+        allowNull: true,
+      },
+      nombreSustituto: {
+        type: Sequelize.STRING(45),
+        allowNull: true,
+      },
+      estado: {
+        type: Sequelize.STRING(15),
+        allowNull: false,
+      },
+      comentarioTalentoHumano: {
+        type: Sequelize.STRING(250),
+        allowNull: true,
+      },
+      idColaborador: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+    },
+    {
+      tableName: "Solicitud",
+      timestamps: false,
+    }
+  );
+
+  Solicitud.belongsTo(sequelize.models.Colaborador, {
+    foreignKey: "idColaborador",
+    as: "colaborador",
+  });
+
+  return Solicitud;
 };
-  
