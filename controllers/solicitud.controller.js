@@ -4,7 +4,6 @@ const Colaborador = db.colaborador; // Import the Colaborador model if not alrea
 
 // Crea una nueva solicitud
 exports.create = (req, res) => {
-  // Verifica si la solicitud tiene una descripción
   if (req.body.length==0) {
     res.status(400).send({
       message: 'No puede venir sin datos'
@@ -74,7 +73,7 @@ exports.update = (req, res) => {
         });
       } else {
         // Actualiza la solicitud con los nuevos datos
-        solicitud.descripcion = req.body.descripcion;
+        solicitud.descripcion = req.body;
 
         // Guarda la solicitud actualizada en la base de datos
         solicitud.save()
