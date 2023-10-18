@@ -10,21 +10,9 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING(80),
             allowNull: false
         },
-        idExpediente: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-        }
     }, {
         tableName: 'Puesto',
         timestamps: false
     });
-
-    Puesto.associate = (models) => {
-        Puesto.belongsTo(models.Expediente, {
-            foreignKey: 'idExpediente',
-            as: 'Expediente'
-        });
-    };
-
     return Puesto;
 };
