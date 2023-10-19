@@ -17,11 +17,21 @@ module.exports = (sequelize, Sequelize) => {
       rol: {
         type: Sequelize.STRING(45),
         allowNull: false
+      },
+      idColaborador : {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       }
     }, {
       tableName: 'Usuario',
       timestamps: false
     });
-  
+
+    //crea la restriccion de llave foranea en la bd
+    Usuario.belongsTo(sequelize.models.Colaborador, {
+      foreignKey: 'idColaborador',
+      as: 'colaborador'
+    });
+    
     return Usuario;
 };

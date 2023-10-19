@@ -27,21 +27,23 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.DATE,
             allowNull: false
         },
-        idUsuario: {
+        unidad: {
+            type: Sequelize.STRING(250),
+            allowNull: true
+        },
+        idPuesto: {
             type: Sequelize.INTEGER,
-            allowNull: false,
-        }
+            allowNull: true,
+        },
     }, {
         tableName: 'Colaborador',
         timestamps: false
     });
 
-    Colaborador.associate = (models) => {
-        Colaborador.belongsTo(models.Usuario, {
-            foreignKey: 'idUsuario',
-            as: 'usuario'
-        });
-    };
-
+    Colaborador.belongsTo(sequelize.models.Puesto, {
+        foreignKey: 'idPuesto',
+        as: 'puesto'
+    });
+    
     return Colaborador;
 };

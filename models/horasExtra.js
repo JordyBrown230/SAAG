@@ -17,10 +17,19 @@ module.exports = (sequelize, Sequelize) => {
         rangoHoras: {
             type: Sequelize.INTEGER,
             allowNull: false
+        },
+        idColaborador: {
+            type:Sequelize.INTEGER,
+            allowNull:false,
         }
     }, {
         tableName: 'HorasExtras',
         timestamps: false
+    });
+
+    HorasExtras.belongsTo(sequelize.models.Colaborador, {
+        foreignKey: 'idColaborador',
+        as: 'colaborador'
     });
 
     return HorasExtras;

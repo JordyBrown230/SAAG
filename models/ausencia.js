@@ -25,13 +25,11 @@ module.exports = (sequelize, Sequelize) => {
         tableName: 'Ausencia',
         timestamps: false
     });
-
-    Ausencia.associate = (models) => {
-        Ausencia.belongsTo(models.Colaborador, {
-            foreignKey: 'idColaborador',
-            as: 'colaborador'
-        });
-    };
+    //crea la restriccion de llave foranea en la bd
+    Ausencia.belongsTo(sequelize.models.Colaborador, {
+        foreignKey: 'idColaborador',
+        as: 'colaborador'
+    });
 
     return Ausencia;
 };

@@ -23,3 +23,7 @@ db.sequelize.sync().then(() => {
 });
 
 module.exports = app;
+
+//opciones de ejecucion
+// - node index.js
+// npx nodemon -> este actualiza los cambios sin tener que parar y levantar el server otra vez
