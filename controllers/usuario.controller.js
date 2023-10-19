@@ -47,22 +47,22 @@
         });
     };
 
-    exports.update = (req, res) => {
-    const id = req.params.id;
-    Usuario.findByPk(id)
-        .then((usuario) => {
-        if (!usuario) return handleError(res, 404, `No se ha encontrado ningún usuario con el número de cédula ${id}`);
-        usuario = { ...usuario, ...req.body };
-        return usuario.save();
-        })
-        .then((updatedUsuario) => {
-        return handleSuccess(res, updatedUsuario);
-        })
-        .catch((error) => {
-        console.error(error);
-        return handleError(res, 500, `Ha ocurrido un error al actualizar los datos del usuario con la cédula: ${id}`);
-        });
-    };
+        exports.update = (req, res) => {
+            const id = req.params.id;
+            Usuario.findByPk(id)
+            .then((usuario) => {
+                if (!usuario) return handleError(res, 404, `No se ha encontrado ningún usuario con el número de cédula ${id}`);
+                return usuario.update(req.body);
+            })
+            .then((updatedUsuario) => {
+                return handleSuccess(res, updatedUsuario);
+            })
+            .catch((error) => {
+                console.error(error);
+                return handleError(res, 500, `Ha ocurrido un error al actualizar los datos del usuario con la cédula: ${id}`);
+            });
+        };
+        
 
     exports.delete = (req, res) => {
     const id = req.params.id;
