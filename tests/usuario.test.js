@@ -24,7 +24,7 @@
 
     // Prueba para obtener un usuario por ID
     it('Debería obtener un usuario por ID', async () => {
-        const id = 1; // Asegúrate de que este ID exista en tu base de datos
+        const id = 1; 
         const response = await request.get(`/saag/usuario/${id}`);
         expect(response.statusCode).toBe(200);
         expect(response.body.idUsuario).toBe(id);
@@ -32,7 +32,7 @@
 
     // Prueba para actualizar un usuario por ID
     it('Debería actualizar un usuario por ID', async () => {
-        const id = 2; 
+        const id = 1; 
         const updatedUserData = {
         NomUsuario: 'Rogers',
         contrasena: 'Scooby',
@@ -46,7 +46,7 @@
 
     // Prueba para eliminar un usuario por ID
     it('Debería eliminar un usuario por ID', async () => {
-        const id = 4;
+        const id = 1;
         const response = await request.delete(`/saag/usuario/${id}`);
         expect(response.statusCode).toBe(200);
         expect(response.body.message).toBe('El usuario ha sido eliminado correctamente');
