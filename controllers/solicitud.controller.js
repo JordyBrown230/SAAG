@@ -14,7 +14,8 @@ exports.create = (req, res) => {
   Solicitud.create(req.body)
     .then(data => {
       res.status(200).send({
-        message: `Agregada correctamente la solicitud de ${req.body.nombreColaborador}`
+        message: `Agregada correctamente la solicitud de ${req.body.nombreColaborador}`,
+        data:data
       });      })
     .catch(err => {
       res.status(500).send({
@@ -74,7 +75,8 @@ exports.update = (req, res) => {
         solicitud.update(req.body)
           .then(() => {
             res.status(200).send({
-              message: `Actualizada correctamente la solicitud con ID ${id}`
+              message: `Actualizada correctamente la solicitud con ID ${id}`,
+              solicitud:solicitud
             });          
           })
           .catch(err => {
