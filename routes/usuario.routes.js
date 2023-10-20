@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const usuarioController = require('../controllers/usuario.controller');
 
-router.post('/usuario/', usuarioController.create);
+router.post('/agregar-usuario/', usuarioController.create);
 
 router.get('/usuarios/', usuarioController.findAll);
 
 router.get('/usuario/:id', usuarioController.findOne);
 
-router.put('/usuario/:id', usuarioController.update);
+router.put('/actualizar-usuario/:id', usuarioController.update);
 
-router.delete('/usuario/:id', usuarioController.delete);
+router.delete('/eliminar-usuario/:id', usuarioController.delete);
 
 module.exports = router;

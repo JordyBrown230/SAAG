@@ -1,81 +1,125 @@
     const db = require('../models');
     const Usuario = db.usuario;
 
-    const handleSuccess = (res, data) => {
-    return res.status(200).json(data);
-    };
-
-    const handleError = (res, status, message) => {
-    return res.status(status).json({ message });
-    };
-
-    exports.create = (req, res) => {
-    const usuario = req.body;
-    if (!usuario) return handleError(res, 400, 'Los datos del usuario no pueden estar vacíos');
-    console.log(usuario);
-    Usuario.create(usuario)
-        .then((createdUsuario) => {
-        return handleSuccess(res, createdUsuario);
-        })
-        .catch((error) => {
-        console.error(error);
-        return handleError(res, 500, 'Ha ocurrido un error al guardar los datos del usuario');
+    // Crea un nuevo usuario
+exports.create = (req, res) => {
+    if (req.body.length==0) {
+      res.status(400).send({
+        message: 'No puede venir sin datos'
+      });
+      return;
+    }
+    // Crea un nuevo usuario
+    Usuario.create(req.body)
+      .then(data => {
+        res.status(200).send({
+          message: `Agregado correctamente el usuario del colaborador con id ${req.body.idColaborador}`
+        });      })
+      .catch(err => {
+        res.status(500).send({
+          message:
+            err.message || 'Ocurrió un error al crear el usuario.'
         });
-    };
-
-    exports.findAll = (req, res) => {
+      });
+  };
+  
+  
+  exports.findAll = (req,res) => { //en Express.js toman dos argumentos: req (la usuario) y res (la respuesta).
     Usuario.findAll()
-        .then((usuarios) => {
-        return handleSuccess(res, usuarios);
-        })
-        .catch((error) => {
-        console.error(error);
-        return handleError(res, 500, 'Ha ocurrido un error al obtener los usuarios almacenados');
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
+        res.status(500).send({
+          message:
+            err.message || 'Ocurrió un error al obtener los usuarios.'
         });
-    };
-
-    exports.findOne = (req, res) => {
+      });
+  };
+  
+  // Obtiene un usuario por ID
+  exports.findOne = (req, res) => {
     const id = req.params.id;
+  
     Usuario.findByPk(id)
-        .then((usuario) => {
-        if (!usuario) return handleError(res, 404, `No se encontró ningún usuario con la cédula ${id}`);
-        return handleSuccess(res, usuario);
-        })
-        .catch((error) => {
-        console.error(error);
-        return handleError(res, 500, `Ha ocurrido un error al obtener el usuario con la cédula número: ${id}`);
+      .then(data => {
+        if (!data) {
+          res.status(404).send({
+            message: `No se encontró un usuario con ID ${id}`
+          });
+        } else {
+          res.send(data);
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: `Ocurrió un error al obtener el usuario con ID ${id}`
         });
-    };
-
-        exports.update = (req, res) => {
-            const id = req.params.id;
-            Usuario.findByPk(id)
-            .then((usuario) => {
-                if (!usuario) return handleError(res, 404, `No se ha encontrado ningún usuario con el número de cédula ${id}`);
-                return usuario.update(req.body);
+      });
+  };
+  
+  // Actualiza un usuario por ID
+  exports.update = (req, res) => {
+    const id = req.params.id;
+    // Busca el usuario en la base de datos
+    Usuario.findByPk(id)
+      .then(usuario => {
+        if (!usuario) {
+          res.status(404).send({
+            message: `No se encontró un usuario con ID ${id}`
+          });
+        } else {
+          // Actualiza el usuario con los nuevos datos del cuerpo del usuario
+          usuario.update(req.body)
+            .then(() => {
+              res.status(200).send({
+                message: `Actualizado correctamente el usuario con ID ${id}`
+              });          
             })
-            .then((updatedUsuario) => {
-                return handleSuccess(res, updatedUsuario);
-            })
-            .catch((error) => {
-                console.error(error);
-                return handleError(res, 500, `Ha ocurrido un error al actualizar los datos del usuario con la cédula: ${id}`);
+            .catch(err => {
+              res.status(500).send({
+                message: `Ocurrió un error al actualizar el usuario con ID ${id}: ${err.message}`
+              });
             });
-        };
-        
-
-    exports.delete = (req, res) => {
-    const id = req.params.id;
-    Usuario.findByPk(id)
-        .then((usuario) => {
-        if (!usuario) return handleError(res, 404, `No se encontró ningún usuario con la cédula ${id}`);
-        return usuario.destroy();
-        })
-        .then(() => {
-        return handleSuccess(res, 'El usuario ha sido eliminado correctamente');
-        })
-        .catch((error) => {
-        console.error(error);
-        return handleError(res, 500, `Ha ocurrido un error al eliminar los datos del usuario con la cédula ${id}`);
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: `Ocurrió un error al obtener el usuario con ID ${id}: ${err.message}`
         });
-    };
+      });
+  };
+  
+  
+  exports.delete = (req, res) => {
+    const id = req.params.id;
+  
+    // Busca el usuario en la base de datos
+    Usuario.findByPk(id)
+      .then(usuario => {
+        if (!usuario) {
+          res.status(404).send({
+            message: `No se encontró un usuario con ID ${id}`
+          });
+        } else {
+          // Elimina el usuario de la base de datos
+          usuario.destroy()
+            .then(() => {
+              res.send({
+                message: 'El usuario fue eliminado exitosamente'
+              });
+            })
+            .catch(err => {
+              res.status(500).send({
+                message:
+                  err.message || `Ocurrió un error al eliminar el usuario con ID ${id}`
+              });
+            });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: `Ocurrió un error al obtener el usuario con ID ${id}`
+        });
+      });
+  };
