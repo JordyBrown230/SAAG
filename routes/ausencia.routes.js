@@ -3,7 +3,7 @@ const router = express.Router();
 const ausenciaController = require('../controllers/ausencia.controller');
 
 // Crea una nueva ausencia
-router.post('/ausencia/', ausenciaController.create);
+router.post('/agregar-ausencia/', ausenciaController.create);
 
 // Obtiene todas las ausenciaes
 router.get('/ausencias/', ausenciaController.findAll);
@@ -11,10 +11,12 @@ router.get('/ausencias/', ausenciaController.findAll);
 // Obtiene una ausencia por ID
 router.get('/ausencia/:id', ausenciaController.findOne);
 
+router.get('/ausencias-por-colaborador/:id',ausenciaController.getAllAusenciasPorColaborador);
+
 // Actualiza una ausencia por ID
-router.put('/ausencia/:id', ausenciaController.update);
+router.put('/actualizar-ausencia/:id', ausenciaController.update);
 
 // Elimina una ausencia por ID
-router.delete('/ausencia/:id', ausenciaController.delete);
+router.delete('/eliminar-ausencia/:id', ausenciaController.delete);
 
 module.exports = router;

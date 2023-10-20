@@ -17,6 +17,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING(250),
             allowNull: true
         },
+        nombreColaborador: {
+            type: Sequelize.STRING(45),
+            allowNull: false,
+          },
         idColaborador: {
             type: Sequelize.INTEGER,
             allowNull: false
