@@ -13,7 +13,8 @@ exports.create = (req, res) => {
     Usuario.create(req.body)
       .then(data => {
         res.status(200).send({
-          message: `Agregado correctamente el usuario del colaborador con id ${req.body.idColaborador}`
+          message: `Agregado correctamente el usuario del colaborador con id ${req.body.idColaborador}`,
+          data:data
         });      })
       .catch(err => {
         res.status(500).send({
