@@ -10,13 +10,12 @@ exports.create = (req, res) => {
     });
     return;
   }
-
-  const solicitud=req.body;
   // Crea una nueva solicitud
-  Solicitud.create(solicitud)
+  Solicitud.create(req.body)
     .then(data => {
-      res.send(data);
-    })
+      res.status(200).send({
+        message: `Agregada correctamente la solicitud de ${req.body.nombreColaborador}`
+      });      })
     .catch(err => {
       res.status(500).send({
         message:
@@ -26,7 +25,7 @@ exports.create = (req, res) => {
 };
 
 
-exports.findAll = (req, res) => {
+exports.findAll = (req,res) => { //en Express.js toman dos argumentos: req (la solicitud) y res (la respuesta).
   Solicitud.findAll()
     .then(data => {
       res.send(data);
@@ -63,7 +62,6 @@ exports.findOne = (req, res) => {
 // Actualiza una solicitud por ID
 exports.update = (req, res) => {
   const id = req.params.id;
-
   // Busca la solicitud en la base de datos
   Solicitud.findByPk(id)
     .then(solicitud => {
@@ -72,28 +70,27 @@ exports.update = (req, res) => {
           message: `No se encontró una solicitud con ID ${id}`
         });
       } else {
-        // Actualiza la solicitud con los nuevos datos
-        solicitud.descripcion = req.body;
-
-        // Guarda la solicitud actualizada en la base de datos
-        solicitud.save()
+        // Actualiza la solicitud con los nuevos datos del cuerpo de la solicitud
+        solicitud.update(req.body)
           .then(() => {
-            res.send(solicitud);
+            res.status(200).send({
+              message: `Actualizada correctamente la solicitud con ID ${id}`
+            });          
           })
           .catch(err => {
             res.status(500).send({
-              message:
-                err.message || `Ocurrió un error al actualizar la solicitud con ID ${id}`
+              message: `Ocurrió un error al actualizar la solicitud con ID ${id}: ${err.message}`
             });
           });
       }
     })
     .catch(err => {
       res.status(500).send({
-        message: `Ocurrió un error al obtener la solicitud con ID ${id}`
+        message: `Ocurrió un error al obtener la solicitud con ID ${id}: ${err.message}`
       });
     });
 };
+
 
 exports.delete = (req, res) => {
   const id = req.params.id;

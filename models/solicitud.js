@@ -5,8 +5,7 @@ module.exports = (sequelize, Sequelize) => {
       idSolicitud: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
-        allowNull: false,
+        autoIncrement: true
       },
       conGoceSalarial: {
         type: Sequelize.BOOLEAN,
