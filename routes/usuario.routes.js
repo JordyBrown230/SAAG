@@ -4,7 +4,7 @@ const usuarioController = require('../controllers/usuario.controller');
 
 router.post('/usuario/', usuarioController.create);
 
-router.get('/usuario/', usuarioController.findAll);
+router.get('/usuarios/', usuarioController.findAll);
 
 router.get('/usuario/:id', usuarioController.findOne);
 

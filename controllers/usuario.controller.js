@@ -1,5 +1,5 @@
     const db = require('../models');
-    const Usuario = db.usuarios;
+    const Usuario = db.usuario;
 
     const handleSuccess = (res, data) => {
     return res.status(200).json(data);
