@@ -12,7 +12,7 @@
     exports.create = (req, res) => {
     const usuario = req.body;
     if (!usuario) return handleError(res, 400, 'Los datos del usuario no pueden estar vacíos');
-
+    console.log(usuario);
     Usuario.create(usuario)
         .then((createdUsuario) => {
         return handleSuccess(res, createdUsuario);
