@@ -5,9 +5,11 @@
     describe('Pruebas para las rutas de Usuario', () => {
     it('Debería crear un nuevo usuario', async () => {
         const newUser = {
+            idUsuario: 1,
         NomUsuario: 'darwin',
         contrasena: 'Kaspers@2',
         rol: 'empleado',
+        idColaborador: 2,
         };
 
         const response = await request.post('/saag/usuario').send(newUser);
@@ -17,7 +19,7 @@
 
     // Prueba para obtener todos los usuarios
     it('Debería obtener todos los usuarios', async () => {
-        const response = await request.get('/saag/usuarios');
+        const response = await request.get('/saag/usuario');
         expect(response.statusCode).toBe(200);
         expect(response.body.length).toBeGreaterThan(0);
     });
@@ -37,6 +39,7 @@
         NomUsuario: 'Rogers',
         contrasena: 'Scooby',
         rol: 'usuario',
+        idColaborador: 2,
         };
 
         const response = await request.put(`/saag/usuario/${id}`).send(updatedUserData);
