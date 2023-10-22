@@ -1,30 +1,40 @@
     const db = require('../models');
     const Usuario = db.usuario;
+    const jwt = require('jsonwebtoken');
+    const bcrypt = require('bcryptjs');
 
-    // Crea un nuevo usuario
-exports.create = (req, res) => {
-    if (req.body.length==0) {
-      res.status(400).send({
-        message: 'No puede venir sin datos'
-      });
-      return;
-    }
-    // Crea un nuevo usuario
-    Usuario.create(req.body)
-      .then(data => {
-        res.status(200).send({
-          message: `Agregado correctamente el usuario del colaborador con id ${req.body.idColaborador}`,
-          data:data
-        });      })
-      .catch(err => {
-        res.status(500).send({
-          message:
-            err.message || 'Ocurrió un error al crear el usuario.'
+    
+  exports.create = async (req, res) => {
+      if (req.body.length === 0) {
+        res.status(400).send({
+          message: 'No puede venir sin datos',
         });
-      });
-  };
-  
-  
+        return;
+      }
+    
+      // Encriptar la contraseña antes de guardarla en la base de datos
+      const hashedPassword = await bcrypt.hash(req.body.contrasena, 10);
+    
+      // Crear un nuevo usuario con la contraseña encriptada
+      Usuario.create({
+        nombreUsuario: req.body.nombreUsuario,
+        contrasena: hashedPassword,
+        rol: req.body.rol,
+        idColaborador: req.body.idColaborador
+      })
+        .then((data) => {
+          res.status(200).send({
+            message: `Agregado correctamente el usuario del colaborador con id ${req.body.idColaborador}`,
+            data: data,
+          });
+        })
+        .catch((err) => {
+          res.status(500).send({
+            message: err.message || 'Ocurrió un error al crear el usuario.',
+          });
+        });
+    };
+    
   exports.findAll = (req,res) => { //en Express.js toman dos argumentos: req (la usuario) y res (la respuesta).
     Usuario.findAll()
       .then(data => {
@@ -124,3 +134,33 @@ exports.create = (req, res) => {
         });
       });
   };
+  
+  exports.login = (req, res) => {
+    const { nombreUsuario, contrasena } = req.body;
+  
+    // Buscar el usuario por nombre de usuario
+    Usuario.findOne({ where: { nombreUsuario } })
+      .then(async (usuario) => {
+        if (!usuario) {
+          return res.status(401).json({ message: 'Nombre de usuario inexistente' });
+        }
+  
+        // Verificar la contraseña utilizando bcrypt.compare
+        const verificarContrasena = await bcrypt.compare(contrasena, usuario.contrasena);
+  
+        if (!verificarContrasena) {
+          return res.status(401).json({ message: 'Contraseña incorrecta' });
+        }
+  
+        // Las credenciales son válidas, generar un token JWT
+        const token = jwt.sign({ nombreUsuario: usuario.nombreUsuario, id: usuario.idUsuario, rol:usuario.rol}, 'secret_key', { expiresIn: '1h' });
+  
+        // Enviar el token al cliente
+        res.json({ token });
+      })
+      .catch((err) => {
+        res.status(500).json({ message: 'Error interno del servidor' });
+      });
+  };
+  
+
