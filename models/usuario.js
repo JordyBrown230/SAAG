@@ -21,6 +21,7 @@ module.exports = (sequelize, Sequelize) => {
       idColaborador : {
         type: Sequelize.INTEGER,
         allowNull: false,
+        unique:true
       }
     }, {
       tableName: 'Usuario',
