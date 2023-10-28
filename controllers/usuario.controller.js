@@ -12,6 +12,13 @@
         return;
       }
     
+      if (!validarContrasena(req.body.contrasena)) {
+        res.status(400).send({
+          message: 'La contraseña no cumple con las reglas requeridas.',
+        });
+        return;
+      }
+    
       // Encriptar la contraseña antes de guardarla en la base de datos
       const hashedPassword = await bcrypt.hash(req.body.contrasena, 10);
     
@@ -72,6 +79,14 @@
   // Actualiza un usuario por ID
   exports.update = (req, res) => {
     const id = req.params.id;
+
+    if (!validarContrasena(req.body.contrasena)) {
+      res.status(400).send({
+        message: 'La contraseña no cumple con las reglas requeridas.',
+      });
+      return;
+    }
+    
     // Busca el usuario en la base de datos
     Usuario.findByPk(id)
       .then(usuario => {
@@ -164,3 +179,12 @@
   };
   
 
+  function validarContrasena(contrasena) {
+    return (
+      contrasena.length >= 8 &&
+      /[A-Z]/.test(contrasena) && // Al menos una letra mayúscula
+      /[a-z]/.test(contrasena) && // Al menos una letra minúscula
+      /[0-9]/.test(contrasena) && // Al menos un número
+      /[@#$%^&*_!.]/.test(contrasena) // Al menos un carácter especial (puedes modificar esta lista)
+    );
+  };
