@@ -8,20 +8,18 @@ router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) =>
   res.json({ message: 'Acceso permitido para el rol de administrador' });
 });
 
-module.exports = router;
-
+// No necesita verificación
+router.post('/login/', usuarioController.login);
 
 router.post('/agregar-usuario/', usuarioController.create);
 
-router.post('/login/', usuarioController.login);
+router.get('/usuarios/', authenticateToken, authorizeRoles(['admin']), usuarioController.findAll);
 
-router.get('/usuarios/', usuarioController.findAll);
+router.get('/usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.findOne);
 
-router.get('/usuario/:id', usuarioController.findOne);
+router.put('/actualizar-usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.update);
 
-router.put('/actualizar-usuario/:id', usuarioController.update);
-
-router.delete('/eliminar-usuario/:id',  authenticateToken, authorizeRoles(['admin']),usuarioController.delete);
+router.delete('/eliminar-usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.delete);
 
 module.exports = router;
 
