@@ -4,12 +4,14 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 exports.create = async (req, res) => {
+  console.log(req.body.nombreUsuario,req.body.idColaborador,req.body.contrasena);
   if (req.body.length === 0) {
     res.status(400).send({
       message: "No puede venir sin datos",
     });
     return;
   }
+
 
   if (!validarContrasena(req.body.contrasena)) {
     res.status(400).send({
