@@ -19,4 +19,9 @@ router.put('/actualizar-ausencia/:id', ausenciaController.update);
 // Elimina una ausencia por ID
 router.delete('/eliminar-ausencia/:id', ausenciaController.delete);
 
+//Funciones especialies
+
+//Busca en un rango de fechas 
+//router.get('/ausencias-en-rango/', ausenciaController.getAusenciasEnRango);
+
 module.exports = router;
