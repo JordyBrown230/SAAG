@@ -38,8 +38,8 @@ describe('Pruebas para las rutas de ausencia', () => {
     it('Debería obtener una ausencia por ID', async () => {
       const ausenciaId = 1;
       const response = await request.get(`/saag/ausencia/${ausenciaId}`);
-      expect(response.statusCode).toBe(200);
-      expect(response.body.idAusencia).toBe(ausenciaId);
+       expect(response.statusCode).toBe(200);
+       expect(response.body.idAusencia).toBe(ausenciaId);
     });
   
   // Prueba para actualizar una ausencia por ID
@@ -60,8 +60,8 @@ describe('Pruebas para las rutas de ausencia', () => {
   it('Debería eliminar una ausencia por ID', async () => {
     const ausenciaId = 1;
     const response = await request.delete(`/saag/eliminar-ausencia/${ausenciaId}`);
-    expect(response.statusCode).toBe(200);
-    expect(response.body.message).toBe('La ausencia fue eliminada exitosamente');
+     expect(response.statusCode).toBe(200);
+     expect(response.body.message).toBe('La ausencia fue eliminada exitosamente');
   });
 });
   

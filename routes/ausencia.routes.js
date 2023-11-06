@@ -1,22 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const ausenciaController = require('../controllers/ausencia.controller');
+const { authenticateToken, authorizeRoles } = require('../middlewares/auth.middleware');
 
-// Crea una nueva ausencia
-router.post('/agregar-ausencia/', ausenciaController.create);
+router.post('/agregar-ausencia/', authenticateToken, ausenciaController.create);
 
-// Obtiene todas las ausenciaes
-router.get('/ausencias/', ausenciaController.findAll);
+router.put('/actualizar-ausencia/:id', authenticateToken, authorizeRoles(['admin']), ausenciaController.update);
 
-// Obtiene una ausencia por ID
-router.get('/ausencia/:id', ausenciaController.findOne);
+router.get('/ausencias/', authenticateToken, authorizeRoles(['admin']), ausenciaController.findAll);
 
-router.get('/ausencias-por-colaborador/:id',ausenciaController.getAllAusenciasPorColaborador);
+router.get('/ausencia/:id', authenticateToken, authorizeRoles(['admin']), ausenciaController.findOne);
 
-// Actualiza una ausencia por ID
-router.put('/actualizar-ausencia/:id', ausenciaController.update);
+router.get('/ausencias-por-colaborador/:id', authenticateToken, authorizeRoles(['admin']), ausenciaController.getAllAusenciasPorColaborador);
 
-// Elimina una ausencia por ID
-router.delete('/eliminar-ausencia/:id', ausenciaController.delete);
+router.delete('/eliminar-ausencia/:id', authenticateToken, authorizeRoles(['admin']), ausenciaController.delete);
+
+//Funciones especialies
+
+//Busca en un rango de fechas 
+//router.get('/ausencias-en-rango/', ausenciaController.getAusenciasEnRango);
 
 module.exports = router;

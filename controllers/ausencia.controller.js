@@ -1,6 +1,8 @@
 const db = require('../models');
 const Ausencia = db.ausencia;
 const Colaborador = db.colaborador; // Import the Colaborador model if not already imported
+const { Op } = require('sequelize');
+
 
 // Crea una nueva ausencia
 exports.create = (req, res) => {
@@ -147,4 +149,43 @@ exports.getAllAusenciasPorColaborador = (req, res) => {
       });
     });
 };
+/*
+exports.getAusenciasEnRango = async (req, res) => {
+  try {
+    let { fechaInicio, fechaFin } = req.body;
 
+    const whereClause = {};
+
+    if (fechaInicio) {
+      whereClause.fechaAusencia = {
+        [Op.gte]: fechaInicio + ' 00:00:00',
+      };
+    }
+
+    if (fechaFin) {
+      if (!fechaInicio) {
+        whereClause.fechaAusencia = {};
+      }
+
+      whereClause.fechaAusencia[Op.lte] = fechaFin + ' 23:59:59';
+    }
+
+    const ausencias = await Ausencia.findAll({
+      where: whereClause,
+      include: [{ model: Colaborador, as: 'colaborador' }],
+    });
+
+    if (ausencias.length === 0) {
+      return res.status(404).json({
+        message: 'No se encontraron ausencias en el rango de fechas especificado',
+      });
+    }
+
+    return res.json(ausencias);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || 'Ocurrió un error al buscar las ausencias en el rango de fechas.',
+    });
+  }
+};
+*/

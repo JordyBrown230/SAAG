@@ -24,8 +24,8 @@ describe('Pruebas para las rutas de solicitud', () => {
     idColaborador: 1
     }
     const response = await request.post('/saag/agregar-solicitud').send(insertData);
-    expect(response.statusCode).toBe(200);
-    expect(response.body.data.tipoSolicitud).toBe(insertData.tipoSolicitud);
+      expect(response.statusCode).toBe(200);
+      expect(response.body.data.tipoSolicitud).toBe(insertData.tipoSolicitud);
   });
 
   // Prueba para obtener todas las solicitudes
@@ -82,7 +82,7 @@ describe('Pruebas para las rutas de solicitud', () => {
   it('Debería eliminar una solicitud por ID', async () => {
     const solicitudId = 1;
     const response = await request.delete(`/saag/eliminar-solicitud/${solicitudId}`);
-    expect(response.statusCode).toBe(200);
-    expect(response.body.message).toBe('La solicitud fue eliminada exitosamente');
+     expect(response.statusCode).toBe(200);
+     expect(response.body.message).toBe('La solicitud fue eliminada exitosamente');
   });
 });

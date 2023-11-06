@@ -1,23 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const solicitudController = require('../controllers/solicitud.controller');
+const { authenticateToken, authorizeRoles } = require('../middlewares/auth.middleware');
 
-// Crea una nueva solicitud
-router.post('/agregar-solicitud/', solicitudController.create);
 
-// Obtiene todas las solicitudes
-router.get('/solicitudes/', solicitudController.findAll);
+router.post('/agregar-solicitud/', authenticateToken, solicitudController.create);
 
-// Obtiene una solicitud por ID
-router.get('/solicitud/:id', solicitudController.findOne);
+router.put('/actualizar-solicitud/:id', authenticateToken, solicitudController.update);
 
-router.get('/solicitudes-por-colaborador/:id',solicitudController.getAllSolicitudesPorColaborador);
+router.get('/solicitudes/', authenticateToken, authorizeRoles(['admin']), solicitudController.findAll);
 
-// Actualiza una solicitud por ID
-router.put('/actualizar-solicitud/:id', solicitudController.update);
+router.get('/solicitud/:id', authenticateToken, authorizeRoles(['admin']), solicitudController.findOne);
 
-// Elimina una solicitud por ID
-router.delete('/eliminar-solicitud/:id', solicitudController.delete);
+router.get('/solicitudes-por-colaborador/:id', authenticateToken, authorizeRoles(['admin']), solicitudController.getAllSolicitudesPorColaborador);
 
+router.delete('/eliminar-solicitud/:id', authenticateToken, authorizeRoles(['admin']), solicitudController.delete);
 
 module.exports = router;

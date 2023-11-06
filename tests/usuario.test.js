@@ -51,6 +51,6 @@ describe('Pruebas para las rutas de Usuario', () => {
   it('Debería eliminar un usuario por ID', async () => {//este test da error porque no estoy logueado como admin
     const id = 1;
     const response = await request.delete(`/saag/eliminar-usuario/${id}`);
-    expect(response.statusCode).toBe(200);
+     expect(response.statusCode).toBe(200);
   });
 });
