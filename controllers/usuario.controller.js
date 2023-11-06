@@ -43,18 +43,23 @@ exports.create = async (req, res) => {
     });
 };
 
-exports.findAll = (req, res) => {
-  //en Express.js toman dos argumentos: req (la usuario) y res (la respuesta).
-  Usuario.findAll()
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
+exports.findAll = async (req, res) => {
+  try {
+    const data = await Usuario.findAll();
+    res.send(data);
+  } catch (err) {
+    if (err.name === 'SequelizeDatabaseError') {
       res.status(500).send({
-        message: err.message || "Ocurrió un error al obtener los usuarios.",
+        message: "Error en la base de datos. Verifica la configuración.",
       });
-    });
+    } else {
+      res.status(500).send({
+        message: "Ocurrió un error al obtener los usuarios.",
+      });
+    }
+  }
 };
+
 
 // Obtiene un usuario por ID
 exports.findOne = (req, res) => {
@@ -178,23 +183,74 @@ exports.login = (req, res) => {
       }
 
       // Las credenciales son válidas, generar un token JWT
-      const token = jwt.sign(
+      const accessToken = jwt.sign(
         {
           nombreUsuario: usuario.nombreUsuario,
           id: usuario.idUsuario,
           rol: usuario.rol,
         },
         "secret_key",
-        { expiresIn: "1h" }
+        { expiresIn: "30s" }
       );
 
-      // Enviar el token al cliente
-      res.json({ token });
+      const refreshToken = jwt.sign(
+        {
+          nombreUsuario: usuario.nombreUsuario,
+          id: usuario.idUsuario,
+          rol: usuario.rol,
+        },
+        "secretRefresh_key"
+      );
+
+      await usuario.update({
+        refreshToken: refreshToken
+      });
+
+      res.json({accessToken, refreshToken});
     })
     .catch((err) => {
       res.status(500).json({ message: "Error interno del servidor" });
     });
 };
+
+exports.refreshToken = (req, res) => {
+
+  const refreshToken = req.params.token;
+
+  if (!refreshToken) return res.sendStatus(401).json({ message:  refreshToken});
+
+  // Se busca el usuario por refreshToken
+  Usuario.findOne({ where: { refreshToken } })
+    .then(async (usuario) => {
+      if (!usuario) {
+        return res
+          .status(401)
+          .json({ message: "token inexistente" });
+      }
+
+
+      const newToken = jwt.sign(
+        {
+          nombreUsuario: usuario.nombreUsuario,
+          id: usuario.idUsuario,
+          rol: usuario.rol,
+        },
+        "secret_key",
+        { expiresIn: "30s" }
+      );
+
+      res.json({newToken});
+    })
+    .catch((err) => {
+      res.status(500).json({ message: "Error interno del servidor" });
+    });
+};
+
+
+
+
+
+
 
 function validarContrasena(contrasena) {
   return (
