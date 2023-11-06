@@ -10,7 +10,6 @@ router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) =>
 
 module.exports = router;
 
-
 router.post('/agregar-usuario/', usuarioController.create);
 
 router.post('/login/', usuarioController.login);

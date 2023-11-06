@@ -43,18 +43,23 @@ exports.create = async (req, res) => {
     });
 };
 
-exports.findAll = (req, res) => {
-  //en Express.js toman dos argumentos: req (la usuario) y res (la respuesta).
-  Usuario.findAll()
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
+exports.findAll = async (req, res) => {
+  try {
+    const data = await Usuario.findAll();
+    res.send(data);
+  } catch (err) {
+    if (err.name === 'SequelizeDatabaseError') {
       res.status(500).send({
-        message: err.message || "Ocurrió un error al obtener los usuarios.",
+        message: "Error en la base de datos. Verifica la configuración.",
       });
-    });
+    } else {
+      res.status(500).send({
+        message: "Ocurrió un error al obtener los usuarios.",
+      });
+    }
+  }
 };
+
 
 // Obtiene un usuario por ID
 exports.findOne = (req, res) => {
