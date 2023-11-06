@@ -11,6 +11,8 @@ router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) =>
 // No necesita verificación
 router.post('/login/', usuarioController.login);
 
+router.post('/refresh/:token',  usuarioController.refreshToken);
+
 router.post('/agregar-usuario/', usuarioController.create);
 
 router.get('/usuarios/', authenticateToken, authorizeRoles(['admin']), usuarioController.findAll);

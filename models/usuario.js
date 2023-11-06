@@ -22,6 +22,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: false,
         unique:true
+      },
+      refreshToken : {
+        type: Sequelize.STRING,
+        allowNull: true,
       }
     }, {
       tableName: 'Usuario',
