@@ -1,6 +1,10 @@
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
-    host: process.env.DB_HOST,
+const DB_NAME = 'SAAG';
+const DB_USER = 'SAAG';
+const DB_PASSWORD = 'Acib2023!!!';
+const DB_HOST = 'ing.mysql.database.azure.com';
+const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+    host: DB_HOST,
     dialect: 'mysql',
     define: {
         freezeTableName: true
