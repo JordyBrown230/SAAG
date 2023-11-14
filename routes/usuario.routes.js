@@ -12,7 +12,7 @@ router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) =>
 router.post('/login/', usuarioController.login);
 router.post('/refresh/:token',  usuarioController.refreshToken);
 
-router.post('/agregar-usuario/', usuarioController.create);
+router.post('/agregar-usuario/',  authenticateToken, authorizeRoles(['admin']), usuarioController.create);
 
 router.get('/usuarios/', authenticateToken, authorizeRoles(['admin']), usuarioController.findAll);
 
