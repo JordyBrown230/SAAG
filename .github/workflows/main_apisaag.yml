@@ -57,7 +57,7 @@ jobs:
         with:
           app-name: 'APISAAG'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_960307D8E7BD4BEEABEDC61C5C1A1E0F }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BFB57D3016C8432590F38E22E0B3668E }}
           package: .
 
       - name: Set up Node.js version

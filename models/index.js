@@ -1,16 +1,20 @@
 const Sequelize = require('sequelize');
-
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
-  host: process.env.DB_HOST,
+const {
+  DB_USER, DB_PASSWORD, DB_HOST, DB_NAME,DB_PORT
+} = process.env;
+console.log(DB_PORT)
+const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+  host: DB_HOST,
+  port:DB_PORT,
   dialect: 'mysql',
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false
-    }
-  },
   define: {
-    freezeTableName: true
+      freezeTableName: true
+  },
+  dialectOptions: {
+      ssl: {
+          require: true,
+          rejectUnauthorized: false
+      }
   }
 });
 
