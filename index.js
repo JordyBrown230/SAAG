@@ -14,6 +14,7 @@ app.use(cors());
 app.use('/saag', require('./routes/solicitud.routes'));
 app.use('/saag', require('./routes/ausencia.routes'));
 app.use('/saag', require('./routes/usuario.routes'));
+app.use('/saag', require('./routes/colaborador.routes'));
 
 // Sincroniza la base de datos
 db.sequelize.sync().then(() => {

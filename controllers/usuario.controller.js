@@ -83,7 +83,6 @@ exports.findOne = (req, res) => {
 };
 
 // Actualiza un usuario por ID
-// Actualiza un usuario por ID
 exports.update = async (req, res) => {
   const id = req.params.id;
 
@@ -245,12 +244,6 @@ exports.refreshToken = (req, res) => {
       res.status(500).json({ message: "Error interno del servidor" });
     });
 };
-
-
-
-
-
-
 
 function validarContrasena(contrasena) {
   return (
