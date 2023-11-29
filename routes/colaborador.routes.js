@@ -7,13 +7,13 @@ router.post('/agregar-colaborador/', authenticateToken, authorizeRoles(['admin']
 
 router.put('/actualizar-colaborador/:id', authenticateToken, authorizeRoles(['admin']), colaboradorController.updateColaborador);
 
-router.get('/colaboradores/', /*authenticateToken, authorizeRoles(['admin']),*/ colaboradorController.findAllColaboradores);
+router.get('/colaboradores/', authenticateToken, authorizeRoles(['admin']), colaboradorController.findAllColaboradores);
 
 router.delete('/eliminar-colaborador/:id', authenticateToken, authorizeRoles(['admin']), colaboradorController.deleteColaborador);
 
 router.get('/colaborador/:id', authenticateToken, authorizeRoles(['admin']), colaboradorController.findOneColaborador);
 
 //especifica
-router.get('/colaboradores-usuarios/', /*authenticateToken, authorizeRoles(['admin']),*/ colaboradorController.findColaboradoresSinUsuario);
+router.get('/colaboradores-usuarios/', authenticateToken, authorizeRoles(['admin']), colaboradorController.findColaboradoresSinUsuario);
 
 module.exports = router;
