@@ -189,7 +189,7 @@ exports.login = (req, res) => {
           rol: usuario.rol,
         },
         "secret_key",
-        { expiresIn: "30s" }
+        { expiresIn: "15m" }
       );
 
       const refreshToken = jwt.sign(
@@ -235,7 +235,7 @@ exports.refreshToken = (req, res) => {
           rol: usuario.rol,
         },
         "secret_key",
-        { expiresIn: "30s" }
+        { expiresIn: "15m" }
       );
 
       res.json({newToken});
