@@ -1,5 +1,6 @@
 const db = require("../models");
 const Usuario = db.usuario;
+const Colaborador = db.colaborador;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
@@ -163,7 +164,13 @@ exports.login = (req, res) => {
   const { nombreUsuario, contrasena } = req.body;
 
   // Buscar el usuario por nombre de usuario
-  Usuario.findOne({ where: { nombreUsuario } })
+  Usuario.findOne({ where: { nombreUsuario }, 
+    include: [
+      {
+        model: Colaborador,
+        as: 'colaborador',
+      },
+    ], })
     .then(async (usuario) => {
       if (!usuario) {
         return res
@@ -204,8 +211,8 @@ exports.login = (req, res) => {
       await usuario.update({
         refreshToken: refreshToken
       });
-
-      res.json({accessToken, refreshToken});
+      const colaborador = usuario.colaborador;
+      res.json({colaborador, accessToken, refreshToken});
     })
     .catch((err) => {
       res.status(500).json({ message: "Error interno del servidor" });
