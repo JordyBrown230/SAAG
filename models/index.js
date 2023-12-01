@@ -7,6 +7,7 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
   port:DB_PORT,
   dialect: 'mysql',
+  timezone: '-06:00',
   define: {
       freezeTableName: true
   },
@@ -33,5 +34,6 @@ db.horasExtra = require('./horasExtra')(sequelize,Sequelize);
 db.expediente = require('./expediente')(sequelize,Sequelize);
 db.curriculum = require('./curriculum')(sequelize, Sequelize);
 db.titulo = require('./titulo')(sequelize,Sequelize);
+db.auditoria = require('./auditoria')(sequelize,Sequelize);
 
 module.exports = db;

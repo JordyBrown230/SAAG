@@ -3,7 +3,7 @@ const Solicitud = db.solicitud;
 const Colaborador = db.colaborador; // Import the Colaborador model if not already imported
 
 // Crea una nueva solicitud
-exports.create = (req, res) => {
+exports.create = (req, res, next) => {
   if (req.body.length==0) {
     res.status(400).send({
       message: 'No puede venir sin datos'
@@ -16,7 +16,9 @@ exports.create = (req, res) => {
       res.status(200).send({
         message: `Agregada correctamente la solicitud de ${req.body.nombreColaborador}`,
         data:data
-      });      })
+      });     
+      next();
+    })
     .catch(err => {
       res.status(500).send({
         message:
@@ -26,10 +28,11 @@ exports.create = (req, res) => {
 };
 
 
-exports.findAll = (req,res) => { //en Express.js toman dos argumentos: req (la solicitud) y res (la respuesta).
+exports.findAll = (req,res, next) => { //en Express.js toman dos argumentos: req (la solicitud) y res (la respuesta).
   Solicitud.findAll()
     .then(data => {
       res.send(data);
+      next();
     })
     .catch(err => {
       res.status(500).send({
@@ -40,7 +43,7 @@ exports.findAll = (req,res) => { //en Express.js toman dos argumentos: req (la s
 };
 
 // Obtiene una solicitud por ID
-exports.findOne = (req, res) => {
+exports.findOne = (req, res, next) => {
   const id = req.params.id;
 
   Solicitud.findByPk(id)
@@ -51,6 +54,7 @@ exports.findOne = (req, res) => {
         });
       } else {
         res.send(data);
+        next();
       }
     })
     .catch(err => {
@@ -61,7 +65,7 @@ exports.findOne = (req, res) => {
 };
 
 // Actualiza una solicitud por ID
-exports.update = (req, res) => {
+exports.update = (req, res, next) => {
   const id = req.params.id;
   // Busca la solicitud en la base de datos
   Solicitud.findByPk(id)
@@ -77,7 +81,8 @@ exports.update = (req, res) => {
             res.status(200).send({
               message: `Actualizada correctamente la solicitud con ID ${id}`,
               solicitud:solicitud
-            });          
+            });  
+            next();        
           })
           .catch(err => {
             res.status(500).send({
@@ -94,7 +99,7 @@ exports.update = (req, res) => {
 };
 
 
-exports.delete = (req, res) => {
+exports.delete = (req, res, next) => {
   const id = req.params.id;
 
   // Busca la solicitud en la base de datos
@@ -111,6 +116,7 @@ exports.delete = (req, res) => {
             res.send({
               message: 'La solicitud fue eliminada exitosamente'
             });
+            next();
           })
           .catch(err => {
             res.status(500).send({
@@ -127,7 +133,7 @@ exports.delete = (req, res) => {
     });
 };
 
-exports.getAllSolicitudesPorColaborador = (req, res) => {
+exports.getAllSolicitudesPorColaborador = (req, res, next) => {
   const colaboradorId = req.params.id;
 
   Solicitud.findAll({
@@ -141,6 +147,7 @@ exports.getAllSolicitudesPorColaborador = (req, res) => {
         });
       } else {
         res.send(data);
+        next();
       }
     })
     .catch(err => {

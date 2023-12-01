@@ -20,4 +20,4 @@ function authorizeRoles(roles) {
   };
 }
 
-module.exports = { authenticateToken, authorizeRoles };
+module.exports = { authenticateToken, authorizeRoles};

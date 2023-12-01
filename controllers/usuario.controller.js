@@ -4,7 +4,7 @@ const Colaborador = db.colaborador;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   console.log(req.body.nombreUsuario,req.body.idColaborador,req.body.contrasena);
   if (req.body.length === 0) {
     res.status(400).send({
@@ -36,6 +36,7 @@ exports.create = async (req, res) => {
         message: `Agregado correctamente el usuario del colaborador con id ${req.body.idColaborador}`,
         data: data,
       });
+      next();
     })
     .catch((err) => {
       res.status(500).send({
@@ -44,10 +45,11 @@ exports.create = async (req, res) => {
     });
 };
 
-exports.findAll = async (req, res) => {
+exports.findAll = async (req, res, next) => {
   try {
     const data = await Usuario.findAll();
     res.send(data);
+    next();
   } catch (err) {
     if (err.name === 'SequelizeDatabaseError') {
       res.status(500).send({
@@ -63,7 +65,7 @@ exports.findAll = async (req, res) => {
 
 
 // Obtiene un usuario por ID
-exports.findOne = (req, res) => {
+exports.findOne = (req, res, next) => {
   const id = req.params.id;
 
   Usuario.findByPk(id)
@@ -74,6 +76,7 @@ exports.findOne = (req, res) => {
         });
       } else {
         res.send(data);
+        next();
       }
     })
     .catch((err) => {
@@ -84,7 +87,7 @@ exports.findOne = (req, res) => {
 };
 
 // Actualiza un usuario por ID
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   const id = req.params.id;
 
   if (!validarContrasena(req.body.contrasena)) {
@@ -118,6 +121,7 @@ exports.update = async (req, res) => {
     res.status(200).send({
       message: `Actualizado correctamente el usuario con ID ${id}`,
     });
+    next();
   } catch (err) {
     res.status(500).send({
       message: `Ocurrió un error al actualizar el usuario con ID ${id}: ${err.message}`,
@@ -125,7 +129,7 @@ exports.update = async (req, res) => {
   }
 };
 
-exports.delete = (req, res) => {
+exports.delete = (req, res, next) => {
   const id = req.params.id;
 
   // Busca el usuario en la base de datos
@@ -143,6 +147,7 @@ exports.delete = (req, res) => {
             res.send({
               message: "El usuario fue eliminado exitosamente",
             });
+            next();
           })
           .catch((err) => {
             res.status(500).send({
@@ -211,8 +216,35 @@ exports.login = (req, res) => {
       await usuario.update({
         refreshToken: refreshToken
       });
+
       const colaborador = usuario.colaborador;
       res.json({colaborador, accessToken, refreshToken});
+    })
+    .catch((err) => {
+      res.status(500).json({ message: "Error interno del servidor" });
+    });
+};
+
+exports.logout = (req, res) => {
+  const refreshToken = req.params.token;
+
+  if (!refreshToken) return res.sendStatus(401).json({ message:  refreshToken});
+
+  Usuario.findOne({ where: { refreshToken } })
+  .then(async (usuario) => {
+    if (!usuario) {
+      return res
+        .status(401)
+        .json({ message: "token inexistente" });
+    }
+
+      await usuario.update({
+        refreshToken: null
+      });
+      res.status(200).send({
+        message: "Sesión cerrada exitosamente",
+      });
+
     })
     .catch((err) => {
       res.status(500).json({ message: "Error interno del servidor" });
