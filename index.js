@@ -6,7 +6,7 @@ const db = require('./models');
 const {audit} = require('./middlewares/audit.middleware');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 app.use(bodyParser.json());
 app.use(cors());

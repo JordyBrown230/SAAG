@@ -46,6 +46,7 @@ exports.findAll = (req,res, next) => { //en Express.js toman dos argumentos: req
 exports.findOne = (req, res, next) => {
   const id = req.params.id;
 
+
   Solicitud.findByPk(id)
     .then(data => {
       if (!data) {
@@ -75,14 +76,16 @@ exports.update = (req, res, next) => {
           message: `No se encontró una solicitud con ID ${id}`
         });
       } else {
+
+        req.datos = {...solicitud.get()};
         // Actualiza la solicitud con los nuevos datos del cuerpo de la solicitud
         solicitud.update(req.body)
           .then(() => {
             res.status(200).send({
               message: `Actualizada correctamente la solicitud con ID ${id}`,
               solicitud:solicitud
-            });  
-            next();        
+            }); 
+            next();   
           })
           .catch(err => {
             res.status(500).send({
@@ -110,6 +113,8 @@ exports.delete = (req, res, next) => {
           message: `No se encontró una solicitud con ID ${id}`
         });
       } else {
+
+        req.datos = {...solicitud.get()};
         // Elimina la solicitud de la base de datos
         solicitud.destroy()
           .then(() => {

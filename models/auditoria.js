@@ -25,6 +25,14 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             allowNull: false,
         },
+        datosAntiguos : {
+            type: Sequelize.TEXT,
+            allowNull: true,
+        },
+        datosNuevos : {
+            type: Sequelize.TEXT,
+            allowNull: true,
+        },
         fecha: {
             type: Sequelize.DATE,
             defaultValue: Sequelize.literal("DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')"),

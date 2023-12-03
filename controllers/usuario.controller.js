@@ -13,7 +13,6 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-
   if (!validarContrasena(req.body.contrasena)) {
     res.status(400).send({
       message: "La contraseña no cumple con las reglas requeridas.",
@@ -106,7 +105,7 @@ exports.update = async (req, res, next) => {
       });
       return;
     }
-
+    req.datos = usuario;
     // Encriptar la nueva contraseña antes de actualizarla
     const hashedPassword = await bcrypt.hash(req.body.contrasena, 10);
 
@@ -140,11 +139,13 @@ exports.delete = (req, res, next) => {
           message: `No se encontró un usuario con ID ${id}`,
         });
       } else {
+
+        req.datos = {...usuario.get()};
         // Elimina el usuario de la base de datos
         usuario
           .destroy()
           .then(() => {
-            res.send({
+            res.send({ 
               message: "El usuario fue eliminado exitosamente",
             });
             next();
@@ -201,7 +202,7 @@ exports.login = (req, res) => {
           rol: usuario.rol,
         },
         "secret_key",
-        { expiresIn: "15m" }
+        { expiresIn: "1h" }
       );
 
       const refreshToken = jwt.sign(
@@ -292,4 +293,5 @@ function validarContrasena(contrasena) {
     /[0-9]/.test(contrasena) && // Al menos un número
     /[@#$%^&*_!.]/.test(contrasena) // Al menos un carácter especial (puedes modificar esta lista)
   );
+
 }
