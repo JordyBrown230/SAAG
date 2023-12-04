@@ -35,7 +35,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         fecha: {
             type: Sequelize.DATE,
-            defaultValue: Sequelize.literal("DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')"),
+            defaultValue: Sequelize.NOW
         }
     }, {
         tableName: 'Auditoria',
