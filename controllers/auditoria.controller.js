@@ -2,7 +2,7 @@ const db = require("../models");
 const Auditoria = db.auditoria;
 
 
-exports.create = async (req, res, datos) => {
+exports.createAuditTable = async (req, res, datos, direccionIp, agenteUsuario) => {
  
   if (req.body.length === 0) {
     res.status(400).send({
@@ -49,6 +49,8 @@ exports.create = async (req, res, datos) => {
         url,
         datosAntiguos,
         datosNuevos,
+        direccionIp,
+        agenteUsuario
     })
     .then((data) => {
 
@@ -60,7 +62,7 @@ exports.create = async (req, res, datos) => {
     });
 };
 
-exports.findAll = async (req, res) => {
+exports.findAllAuditTables = async (req, res) => {
     try {
       const data = await Auditoria.findAll();
       res.send(data);
@@ -76,6 +78,7 @@ exports.findAll = async (req, res) => {
       }
     }
   };
+
 
 
 // Obtiene una auditoria por ID
@@ -115,7 +118,7 @@ exports.delete = (req, res, next) => {
           .destroy()
           .then(() => {
             res.send({
-              message: "La auditoria fue eliminado exitosamente",
+              message: "La auditoria fue eliminada exitosamente",
             });
           })
           .catch((err) => {
@@ -125,7 +128,6 @@ exports.delete = (req, res, next) => {
                 `Ocurrió un error al eliminar la auditoria con ID ${id}`,
             });
           });
-          next();
       }
     })
     .catch((err) => {

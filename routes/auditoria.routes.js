@@ -4,7 +4,7 @@ const auditoriaController = require('../controllers/auditoria.controller');
 const { authenticateToken, authorizeRoles} = require('../middlewares/auth.middleware');
 
 
-router.get('/auditorias/', authenticateToken, authorizeRoles(['admin']), auditoriaController.findAll);
+router.get('/auditorias/', authenticateToken, authorizeRoles(['admin']), auditoriaController.findAllAuditTables);
 
 router.get('/auditoria/:id', authenticateToken, authorizeRoles(['admin']), auditoriaController.findOne);
 

@@ -18,11 +18,11 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
         },
         metodo: {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(20),
             allowNull: false,
         },
         url : {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(45),
             allowNull: false,
         },
         datosAntiguos : {
@@ -35,8 +35,16 @@ module.exports = (sequelize, Sequelize) => {
         },
         fecha: {
             type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW
-        }
+            defaultValue: Sequelize.NOW,
+        },
+        direccionIp: {
+            type: Sequelize.STRING(45),
+            allowNull: false,
+        },
+        agenteUsuario: {
+            type: Sequelize.STRING(45),
+            allowNull: false,
+        },
     }, {
         tableName: 'Auditoria',
         timestamps: false

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const usuarioController = require('../controllers/usuario.controller');
 const { authenticateToken, authorizeRoles} = require('../middlewares/auth.middleware');
+const {auditLogin, auditLogout} = require('../middlewares/audit.middleware');
 
 router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) => {
   // Ruta protegida solo para usuarios con rol 'admin'
@@ -9,9 +10,9 @@ router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) =>
 });
 
 // No necesita verificación
-router.post('/login/', usuarioController.login);
+router.post('/login/', usuarioController.login, auditLogin);
 
-router.post('/logout/:token',  usuarioController.logout);
+router.post('/logout/:token',  usuarioController.logout, auditLogout);
 
 router.post('/refresh/:token',  usuarioController.refreshToken);
 

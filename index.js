@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const db = require('./models');
-const {audit} = require('./middlewares/audit.middleware');
+const {auditTables} = require('./middlewares/audit.middleware');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -17,7 +17,8 @@ app.use('/saag', require('./routes/ausencia.routes'));
 app.use('/saag', require('./routes/usuario.routes'));
 app.use('/saag', require('./routes/colaborador.routes'));
 app.use('/saag', require('./routes/auditoria.routes'));
-app.use(audit);
+app.use('/saag', require('./routes/auditoriaLogin.routes'));
+app.use(auditTables);
 // Sincroniza la base de datos
 db.sequelize.sync().then(() => {
   app.listen(PORT, () => {

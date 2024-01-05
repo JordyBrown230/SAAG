@@ -1,18 +1,50 @@
-const {create} = require('../controllers/auditoria.controller')
+const {createAuditTable} = require('../controllers/auditoria.controller');
+const {createAuditLogin, updateAuditLogin} = require('../controllers/auditoriaLogin.controller');
 
 
-const audit = async (req, res, next) => {
+const auditTables = async (req, res, next) => {
 
-        try{  
-            
-            datos = req.datos
-            await create(req, res, datos);
+        try{           
+            const datos = req.datos
+            const direccionIp = req.ip || req.connection.remoteAddress;
+            const agenteUsuario = req.get('user-agent') || 'unknown';
+            await createAuditTable(req, res, datos, direccionIp, agenteUsuario);
 
         }catch(error) {
             console.error(error);
           }
     next();
-    };
+};
+
+const auditLogin = async (req, res) => {
 
 
-module.exports = { audit };
+    try{  
+        const nombreUsuario =  req.body.nombreUsuario;
+        const exito = req.exito;
+        const token = req.token;
+        const direccionIp = req.ip || req.connection.remoteAddress;
+        const agenteUsuario = req.get('user-agent') || 'unknown';
+             
+        await createAuditLogin(req, res, nombreUsuario, exito, token, direccionIp, agenteUsuario);
+
+    }catch(error) {
+        console.error(error);
+      }
+};
+
+const auditLogout = async (req, res) => {
+
+
+    try{  
+        const token = req.params.token;
+       
+        await updateAuditLogin(req, res, token);
+
+    }catch(error) {
+        console.error(error);
+      }
+};
+
+
+module.exports = { auditTables, auditLogin, auditLogout };

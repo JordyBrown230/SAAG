@@ -166,7 +166,7 @@ exports.delete = (req, res, next) => {
     });
 };
 
-exports.login = (req, res) => {
+exports.login = async (req, res,next) => {
   const { nombreUsuario, contrasena } = req.body;
 
   // Buscar el usuario por nombre de usuario
@@ -179,10 +179,14 @@ exports.login = (req, res) => {
     ], })
     .then(async (usuario) => {
       if (!usuario) {
+        req.exito = false;
+        next();
+
         return res
           .status(401)
           .json({ message: "Nombre de usuario inexistente" });
       }
+     
 
       // Verificar la contraseña utilizando bcrypt.compare
       const verificarContrasena = await bcrypt.compare(
@@ -191,6 +195,8 @@ exports.login = (req, res) => {
       );
 
       if (!verificarContrasena) {
+        req.exito = false;
+        next();
         return res.status(401).json({ message: "Contraseña incorrecta" });
       }
 
@@ -202,7 +208,7 @@ exports.login = (req, res) => {
           rol: usuario.rol,
         },
         "secret_key",
-        { expiresIn: "1h" }
+        { expiresIn: "15m" }
       );
 
       const refreshToken = jwt.sign(
@@ -211,7 +217,8 @@ exports.login = (req, res) => {
           id: usuario.idUsuario,
           rol: usuario.rol,
         },
-        "secretRefresh_key"
+        "secretRefresh_key",
+        { expiresIn: "1h" }
       );
 
       await usuario.update({
@@ -219,14 +226,22 @@ exports.login = (req, res) => {
       });
 
       const colaborador = usuario.colaborador;
+
+
+      req.exito = true;
+      req.token = refreshToken;
+      next();
+
       res.json({colaborador, accessToken, refreshToken});
     })
     .catch((err) => {
       res.status(500).json({ message: "Error interno del servidor" });
     });
+    
+    
 };
 
-exports.logout = (req, res) => {
+exports.logout = (req, res, next) => {
   const refreshToken = req.params.token;
 
   if (!refreshToken) return res.sendStatus(401).json({ message:  refreshToken});
@@ -242,6 +257,8 @@ exports.logout = (req, res) => {
       await usuario.update({
         refreshToken: null
       });
+      req.nombreUsuario = usuario.get('nombreUsuario');
+      next();
       res.status(200).send({
         message: "Sesión cerrada exitosamente",
       });
