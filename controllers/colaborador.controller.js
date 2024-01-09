@@ -1,28 +1,38 @@
+    const transporter = require('./gmail.controller');
     const db = require('../models');
     const Colaborador = db.colaborador;
     const Usuario = db.usuario;
-
-    exports.createColaborador = (req, res) => {
-        if (req.body.length === 0) {
-        res.status(400).send({
-            message: 'No puede venir sin datos'
-        });
-        return;
-        }
-    
-        Colaborador.create(req.body)
-        .then(data => {
-            res.status(200).send({
-            message: `Agregado correctamente el colaborador ${req.body.nombre}`,
-            data: data
-            });
-        })
-        .catch(err => {
+  
+    exports.createColaborador = async (req, res) => {
+        try {
+            if (Object.keys(req.body).length === 0) {
+                return res.status(400).send({
+                    message: 'No puede venir sin datos'
+                });
+            }
+            console.log(req.body);
+            console.log(req.body.correoElectronico);
+            const nuevoColaborador = await Colaborador.create(req.body);
+            const toList = [req.body.correoElectronico];
+            const subject = "lo que se deba poner";
+            const htmlContent = `
+                <h2>Test</h2>
+                </br><p>Este es un mensaje personalizado para ti.</p>`;
+            // Esperar ambas operaciones antes de enviar la respuesta
+            await Promise.all([
+                exports.enviarCorreo(toList, subject, htmlContent),
+                res.status(200).send({
+                    message: `Agregado correctamente el colaborador ${req.body.nombre}`,
+                    data: nuevoColaborador
+                })
+            ]);
+        } catch (error) {
             res.status(500).send({
-            message: err.message || 'Ocurrió un error al crear el colaborador.'
+                message: error.message || 'Ocurrió un error al crear el colaborador.'
             });
-        });
+        }
     };
+    
 
     exports.findAllColaboradores = (req, res) => {
         Colaborador.findAll()
@@ -144,3 +154,18 @@
         }
     };
     
+    exports.enviarCorreo = async (toList, subject, htmlContent)=> {
+        const from = '"lo que quieran poner" <dgadeaio4@gmail.com>';
+        console.log(toList);
+    try {
+        await transporter.sendMail({
+            from: from,
+            to: toList,
+            subject: subject,
+            html: htmlContent,
+        });
+        console.log("Correo enviado a:", toList);
+    } catch (error) {
+        console.error("Error al enviar el correo:", error);
+    }
+    }
