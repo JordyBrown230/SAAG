@@ -25,15 +25,21 @@ exports.createAuditTable = async (req, res, datos, direccionIp, agenteUsuario) =
     }
     if(metodo === 'PUT'){
       let datosFiltrados = {};  
-
       Object.keys(req.body).forEach(key => {
-        if(datos.hasOwnProperty(key)){
+        if(datos.hasOwnProperty(key) && req.body[key] !== datos[key]){
             datosFiltrados[key] = datos[key];
         }
     })
 
+    let datosFiltrados2 = {};  
+      Object.keys(datosFiltrados).forEach(key => {
+        if(req.body.hasOwnProperty(key) && datosFiltrados[key] !== req.body[key]){
+            datosFiltrados2[key] = req.body[key];
+        }
+    })
+
     datosAntiguos = Object.entries(datosFiltrados).map(([clave, valor]) => `${clave}: ${valor}`).join(', ');
-    datosNuevos = Object.entries(req.body).map(([clave, valor]) => `${clave}: ${valor}`).join(', ');
+    datosNuevos = Object.entries(datosFiltrados2).map(([clave, valor]) => `${clave}: ${valor}`).join(', ');
 
 
     }

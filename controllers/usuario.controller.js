@@ -48,7 +48,6 @@ exports.findAll = async (req, res, next) => {
   try {
     const data = await Usuario.findAll();
     res.send(data);
-    next();
   } catch (err) {
     if (err.name === 'SequelizeDatabaseError') {
       res.status(500).send({
@@ -75,7 +74,6 @@ exports.findOne = (req, res, next) => {
         });
       } else {
         res.send(data);
-        next();
       }
     })
     .catch((err) => {

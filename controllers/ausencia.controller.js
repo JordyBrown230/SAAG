@@ -17,7 +17,9 @@ exports.create = (req, res) => {
     .then(data => {
       res.status(200).send({
         message: `Agregada correctamente la ausencia de ${req.body.nombreColaborador}`
-      });      })
+      });     
+      next();
+     })
     .catch(err => {
       res.status(500).send({
         message:
@@ -52,6 +54,7 @@ exports.findOne = (req, res) => {
         });
       } else {
         res.send(data);
+        next();
       }
     })
     .catch(err => {
@@ -72,12 +75,15 @@ exports.update = (req, res) => {
           message: `No se encontró una ausencia con ID ${id}`
         });
       } else {
+
+        req.datos = {...ausencia.get()};
         // Actualiza la ausencia con los nuevos datos del cuerpo de la ausencia
         ausencia.update(req.body)
           .then(() => {
             res.status(200).send({
               message: `Actualizada correctamente la ausencia con ID ${id}`
-            });          
+            });
+            next();          
           })
           .catch(err => {
             res.status(500).send({
@@ -105,12 +111,15 @@ exports.delete = (req, res) => {
           message: `No se encontró una ausencia con ID ${id}`
         });
       } else {
+
+        req.datos = {...ausencia.get()};
         // Elimina la ausencia de la base de datos
         ausencia.destroy()
           .then(() => {
             res.send({
               message: 'La ausencia fue eliminada exitosamente'
             });
+            next();
           })
           .catch(err => {
             res.status(500).send({
@@ -141,6 +150,7 @@ exports.getAllAusenciasPorColaborador = (req, res) => {
         });
       } else {
         res.send(data);
+        next();
       }
     })
     .catch(err => {

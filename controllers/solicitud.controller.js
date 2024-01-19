@@ -32,7 +32,6 @@ exports.findAll = (req,res, next) => { //en Express.js toman dos argumentos: req
   Solicitud.findAll()
     .then(data => {
       res.send(data);
-      next();
     })
     .catch(err => {
       res.status(500).send({

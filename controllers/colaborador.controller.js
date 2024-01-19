@@ -22,8 +22,9 @@
                 res.status(200).send({
                     message: `Agregado correctamente el colaborador ${req.body.nombre}`,
                     data: nuevoColaborador
-                })
+                })              
             ]);
+            next();
         } catch (error) {
             res.status(500).send({
                 message: error.message || 'Ocurrió un error al crear el colaborador.'
@@ -55,6 +56,7 @@
             });
             } else {
             res.send(data);
+            next();
             }
         })
         .catch(err => {
@@ -74,12 +76,16 @@
                 message: `No se encontró un colaborador con ID ${id}`
             });
             } else {
+
+            req.datos = {...colaborador.get()};
+
             colaborador.update(req.body)
                 .then(() => {
                 res.status(200).send({
                     message: `Actualizado correctamente el colaborador con ID ${id}`,
                     colaborador: colaborador
                 });
+                next();
                 })
                 .catch(err => {
                 res.status(500).send({
@@ -105,6 +111,9 @@
                 message: `No se encontró un colaborador con ID ${id}`
             });
             } else {
+
+            req.datos = {...colaborador.get()};
+
             colaborador.destroy()
                 .then(() => {
                 res.send({
@@ -115,6 +124,7 @@
                 res.status(500).send({
                     message: err.message || `Ocurrió un error al eliminar el colaborador con ID ${id}`
                 });
+                next();
                 });
             }
         })
