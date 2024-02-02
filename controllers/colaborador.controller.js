@@ -33,7 +33,7 @@
     };
     
 
-    exports.findAllColaboradores = (req, res) => {
+    exports.findAllColaboradores = async (req, res) => {
         Colaborador.findAll()
         .then(data => {
             res.send(data);
@@ -45,7 +45,7 @@
         });
     };
 
-    exports.findOneColaborador = (req, res) => {
+    exports.findOneColaborador = async (req, res) => {
         const id = req.params.id;
     
         Colaborador.findByPk(id)
@@ -66,7 +66,7 @@
         });
     };
 
-    exports.updateColaborador = (req, res) => {
+    exports.updateColaborador = async (req, res) => {
         const id = req.params.id;
     
         Colaborador.findByPk(id)
@@ -101,7 +101,7 @@
         });
     };
 
-    exports.deleteColaborador = (req, res) => {
+    exports.deleteColaborador = async (req, res) => {
         const id = req.params.id;
     
         Colaborador.findByPk(id)
