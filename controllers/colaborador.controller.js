@@ -10,21 +10,21 @@
                     message: 'No puede venir sin datos'
                 });
             }
+    
             const nuevoColaborador = await Colaborador.create(req.body);
-            const toList = [req.body.correoElectronico];
+            const toList = [req.body.correoElectronico, "darwinjavisilva@gmail.com"];
             const subject = "Nuevo colaborador";
             const htmlContent = `
                 <h2>muestra</h2>
                 </br><p>se ha agregado un nuevo colaborador con los siguientes datos.</p> </br> nombre: ${req.body.nombre}
                 </br></br> correo: ${req.body.correoElectronico}`;
-            await Promise.all([
-                exports.enviarCorreo(toList, subject, htmlContent),
-                res.status(200).send({
-                    message: `Agregado correctamente el colaborador ${req.body.nombre}`,
-                    data: nuevoColaborador
-                })              
-            ]);
-            next();
+    
+            await exports.enviarCorreo(toList, subject, htmlContent);
+    
+            res.status(200).send({
+                message: `Agregado correctamente el colaborador ${req.body.nombre}`,
+                data: nuevoColaborador
+            });
         } catch (error) {
             res.status(500).send({
                 message: error.message || 'Ocurrió un error al crear el colaborador.'
@@ -32,7 +32,6 @@
         }
     };
     
-
     exports.findAllColaboradores = async (req, res) => {
         Colaborador.findAll()
         .then(data => {
@@ -162,18 +161,21 @@
         }
     };
     
-        exports.enviarCorreo = async (toList, subject, htmlContent)=> {
-            const from = '"Se agrego como un nuevo colaborador" <dgadeaio4@gmail.com>';
-            console.log(toList);
+    exports.enviarCorreo = async (toList, subject, htmlContent) => {
+        const from = '"Se agregó como un nuevo colaborador" <dgadeaio4@gmail.com>';
+        // Verifica si toList es una cadena (un solo correo) o una matriz (varios correos)
+        const destinatarios = Array.isArray(toList) ? toList.join(', ') : toList;
+        console.log(destinatarios);
         try {
             await transporter.sendMail({
                 from: from,
-                to: toList,
+                to: destinatarios,
                 subject: subject,
                 html: htmlContent,
             });
-            console.log("Correo enviado a:", toList);
+            console.log("Correo enviado a:", destinatarios);
         } catch (error) {
             console.error("Error al enviar el correo:", error);
         }
-        }
+    }
+    
