@@ -1,4 +1,4 @@
-    const transporter = require('./gmail.controller');
+    const enviarCorreo = require('./gmail.controller')
     const db = require('../models');
     const Colaborador = db.colaborador;
     const Usuario = db.usuario;
@@ -15,11 +15,43 @@
             const toList = [req.body.correoElectronico, "darwinjavisilva@gmail.com"];
             const subject = "Nuevo colaborador";
             const htmlContent = `
-                <h2>muestra</h2>
-                </br><p>se ha agregado un nuevo colaborador con los siguientes datos.</p> </br> nombre: ${req.body.nombre}
-                </br></br> correo: ${req.body.correoElectronico}`;
-    
-            await exports.enviarCorreo(toList, subject, htmlContent);
+                <style>
+                    h2 {
+                        color: #333;
+                        border-bottom: 2px solid #333;
+                        padding-bottom: 10px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 10px;
+                    }
+                    th, td {
+                        padding: 10px;
+                        text-align: left;
+                        border-bottom: 1px solid #ddd;
+                    }
+                    th {
+                        background-color: #f2f2f2;
+                    }
+                </style>
+                <h2>Muestra</h2>
+                <table>
+                    <tr>
+                        <th>Información</th>
+                        <th>Datos</th>
+                    </tr>
+                    <tr>
+                        <td>Nombre:</td>
+                        <td>${req.body.nombre}</td>
+                    </tr>
+                    <tr>
+                        <td>Correo:</td>
+                        <td>${req.body.correoElectronico}</td>
+                    </tr>
+                </table>
+            `;
+            await enviarCorreo(toList, subject, htmlContent);
     
             res.status(200).send({
                 message: `Agregado correctamente el colaborador ${req.body.nombre}`,
@@ -160,22 +192,4 @@
         });
         }
     };
-    
-    exports.enviarCorreo = async (toList, subject, htmlContent) => {
-        const from = '"Se agregó como un nuevo colaborador" <dgadeaio4@gmail.com>';
-        // Verifica si toList es una cadena (un solo correo) o una matriz (varios correos)
-        const destinatarios = Array.isArray(toList) ? toList.join(', ') : toList;
-        console.log(destinatarios);
-        try {
-            await transporter.sendMail({
-                from: from,
-                to: destinatarios,
-                subject: subject,
-                html: htmlContent,
-            });
-            console.log("Correo enviado a:", destinatarios);
-        } catch (error) {
-            console.error("Error al enviar el correo:", error);
-        }
-    }
     
