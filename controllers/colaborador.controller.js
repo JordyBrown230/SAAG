@@ -1,4 +1,4 @@
-    const enviarCorreo = require('./gmail.controller')
+    const enviarCorreo = require('./gmail.controller')   // instancia de la funcion enviar correo 
     const db = require('../models');
     const Colaborador = db.colaborador;
     const Usuario = db.usuario;
@@ -10,8 +10,9 @@
                     message: 'No puede venir sin datos'
                 });
             }
-    
+           
             const nuevoColaborador = await Colaborador.create(req.body);
+            //datos que se vana a necesitar, basicamente definimos correos y demas
             const toList = [req.body.correoElectronico, "darwinjavisilva@gmail.com"];
             const subject = "Nuevo colaborador";
             const htmlContent = `
@@ -51,7 +52,7 @@
                     </tr>
                 </table>
             `;
-            await enviarCorreo(toList, subject, htmlContent);
+            await enviarCorreo(toList, subject, htmlContent);  // forma de utilizar la funcion global
     
             res.status(200).send({
                 message: `Agregado correctamente el colaborador ${req.body.nombre}`,
