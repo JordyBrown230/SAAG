@@ -13,7 +13,7 @@
            
             const nuevoColaborador = await Colaborador.create(req.body);
             //datos que se vana a necesitar, basicamente definimos correos y demas
-            const toList = [req.body.correoElectronico, "darwinjavisilva@gmail.com"];
+            const toList = [req.body.correoElectronico, "darwinjavisilva@gmail.com"];  // el otro correo es de prueva para ver si se puede hacer con mas de uno, tienen que cambiarlo
             const subject = "Nuevo colaborador";
             const htmlContent = `
                 <style>
