@@ -10,7 +10,6 @@
                     message: 'No puede venir sin datos'
                 });
             }
-           
             const nuevoColaborador = await Colaborador.create(req.body);
             //datos que se vana a necesitar, basicamente definimos correos y demas
             const toList = [req.body.correoElectronico, "darwinjavisilva@gmail.com"];  // el otro correo es de prueva para ver si se puede hacer con mas de uno, tienen que cambiarlo
@@ -36,7 +35,7 @@
                         background-color: #f2f2f2;
                     }
                 </style>
-                <h2>Muestra</h2>
+                <h2>Informacion del nuevo colaborador</h2>
                 <table>
                     <tr>
                         <th>Información</th>
