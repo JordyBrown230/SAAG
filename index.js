@@ -16,6 +16,7 @@ app.use('/saag', require('./routes/solicitud.routes'));
 app.use('/saag', require('./routes/ausencia.routes'));
 app.use('/saag', require('./routes/usuario.routes'));
 app.use('/saag', require('./routes/colaborador.routes'));
+app.use('/saag', require('./routes/puesto.routes'));
 app.use('/saag', require('./routes/auditoria.routes'));
 app.use('/saag', require('./routes/auditoriaLogin.routes'));
 app.use(auditTables);
