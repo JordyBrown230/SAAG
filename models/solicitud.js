@@ -29,16 +29,16 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       fechaSolicitud: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       fechaInicio: {
-        type: Sequelize.DATE,
-        allowNull: true,
+        type: Sequelize.DATEONLY,
+        allowNull: false,
       },
       fechaFin: {
-        type: Sequelize.DATE,
-        allowNull: true,
+        type: Sequelize.DATEONLY,
+        allowNull: false,
       },
       //en caso de ser por horas
       horaInicio: {

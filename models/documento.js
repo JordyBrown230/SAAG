@@ -1,6 +1,7 @@
+
 module.exports = (sequelize,Sequelize) => {
-    const Titulo = sequelize.define('Titulo', {
-        idTitulo:{
+    const Documento = sequelize.define('Documento', {
+        idDocumento:{
             type: Sequelize.INTEGER,
             autoIncrement: true,
             primaryKey: true,
@@ -14,19 +15,27 @@ module.exports = (sequelize,Sequelize) => {
             type: Sequelize.BLOB('long'),
             allowNull: false
         },
+        tamaño: {
+            type: Sequelize.STRING(50),
+            allowNull: true,
+        },
+        fechaSubida: {
+            type: Sequelize.STRING(10),
+            allowNull: true,
+        },
         idColaborador: {
             type: Sequelize.INTEGER,
             allowNull: false,
         }
     },{
-        tableName: 'Titulo',
+        tableName: 'Documento',
         timestamps: false
     });
-
-    Titulo.belongsTo(sequelize.models.Colaborador, {
+    Documento.belongsTo(sequelize.models.Colaborador, {
         foreignKey: 'idColaborador',
         as: 'colaborador'
     });
-    
-    return Titulo;
+
+    return Documento;
 };
+

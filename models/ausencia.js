@@ -6,11 +6,11 @@ module.exports = (sequelize, Sequelize) => {
             autoIncrement: true
         },
         fechaAusencia: {
-            type: Sequelize.DATE,
+            type: Sequelize.DATEONLY,
             allowNull: false
         },
         fechaFin: {
-            type: Sequelize.DATE,
+            type: Sequelize.DATEONLY,
             allowNull: true
         },
         razon: {

@@ -6,11 +6,11 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true
     },
     fechaIngreso: {
-      type: Sequelize.DATE,
+      type: Sequelize.DATEONLY,
       allowNull: false
     },
     fechaSalida: {
-      type: Sequelize.DATE,
+      type: Sequelize.DATEONLY,
       allowNull: true
     },
     idColaborador: {

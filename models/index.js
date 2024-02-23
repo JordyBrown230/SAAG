@@ -32,9 +32,8 @@ db.ausencia = require('./ausencia')(sequelize, Sequelize);
 db.telefono = require('./telefonoEmpleado')(sequelize,Sequelize);
 db.horasExtra = require('./horasExtra')(sequelize,Sequelize);
 db.expediente = require('./expediente')(sequelize,Sequelize);
-db.curriculum = require('./curriculum')(sequelize, Sequelize);
-db.titulo = require('./titulo')(sequelize,Sequelize);
 db.auditoria = require('./auditoria')(sequelize,Sequelize);
 db.auditoriaLogin = require('./auditoriaLogin')(sequelize,Sequelize);
+db.documento = require('./documento')(sequelize,Sequelize);
 
 module.exports = db;

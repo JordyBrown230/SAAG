@@ -6,8 +6,17 @@ module.exports = (sequelize, Sequelize) => {
             autoIncrement: true,
             allowNull: false
         },
+        identificacion: { 
+            type: Sequelize.STRING(100),
+            allowNull: false,
+            unique: true
+        },
+        fotoCarnet: {
+            type: Sequelize.BLOB('long'),
+            allowNull: true
+        },
         nombre: {
-            type: Sequelize.STRING(90),
+            type: Sequelize.STRING(150),
             allowNull: false
         },
         correoElectronico: {
@@ -24,12 +33,20 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false
         },
         fechaNacimiento: {
-            type: Sequelize.DATE,
+            type: Sequelize.DATEONLY,
+            allowNull: false
+        },
+        equipo: {
+            type: Sequelize.STRING(200),
             allowNull: false
         },
         unidad: {
             type: Sequelize.STRING(250),
             allowNull: true
+        },
+        estado: {
+            type: Sequelize.STRING(50),
+            allowNull: false
         },
         idPuesto: {
             type: Sequelize.INTEGER,
@@ -47,3 +64,4 @@ module.exports = (sequelize, Sequelize) => {
     
     return Colaborador;
 };
+
