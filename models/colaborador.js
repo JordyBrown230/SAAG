@@ -44,6 +44,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING(250),
             allowNull: true
         },
+        tipoJornada: {
+            type: Sequelize.STRING(50),
+            allowNull: true
+        },
         estado: {
             type: Sequelize.STRING(50),
             allowNull: false
