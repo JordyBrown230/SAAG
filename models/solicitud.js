@@ -40,7 +40,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATEONLY,
         allowNull: false,
       },
-      //en caso de ser por horas
       horaInicio: {
         type: Sequelize.TIME,
         allowNull: true,
