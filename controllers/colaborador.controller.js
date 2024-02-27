@@ -12,8 +12,9 @@
             }
             const nuevoColaborador = await Colaborador.create(req.body);
             //datos que se vana a necesitar, basicamente definimos correos y demas
-            const toList = [req.body.correoElectronico, "darwinjavisilva@gmail.com"];  // el otro correo es de prueba para ver si se puede hacer con mas de uno, tienen que cambiarlo, ademas de que eso hace que se cree una lista de correos
-            const subject = "Nuevo colaborador";
+            const from = '"Se agregó como un nuevo colaborador" <dgadeaio4@gmail.com>';
+            const toList = [req.body.correoElectronico];  // el otro correo es de prueba para ver si se puede hacer con mas de uno, tienen que cambiarlo, ademas de que eso hace que se cree una lista de correos
+            const subject = "Nuevo colaborador";// agregar los correos necesarios para notificar de los nuevos colaboradores 
             const htmlContent = `
                 <style>
                     h2 {
@@ -51,7 +52,7 @@
                     </tr>
                 </table>
             `;
-            await enviarCorreo(toList, subject, htmlContent);  // forma de utilizar la funcion global
+            await enviarCorreo(toList, subject, htmlContent, from);  // forma de utilizar la funcion global
     
             res.status(200).send({
                 message: `Agregado correctamente el colaborador ${req.body.nombre}`,
@@ -192,4 +193,91 @@
         });
         }
     };
+    // Funcion IIEF la que permite verificar cada cierto tiempo cualquier cosa, espero lo de los docuemtos para agregar la funcion para verificar fechas de vencimiento
+    (async () => {
+        console.log('Se envió'); // Verificación de carga del archivo
+        try {
+            const nombresCumpleanierosHoy = (colaboradores) => {  // estraemos los colaboradores que cumplen  años
+                const hoy = new Date();
+                return colaboradores
+                    .filter(colaborador => {
+                        const fechaNacimiento = new Date(colaborador.fechaNacimiento);
+                        console.log(fechaNacimiento.getDay());
+                        console.log(fechaNacimiento.getDate());
+                        return (fechaNacimiento.getDate() + 1) === hoy.getDate() && fechaNacimiento.getMonth() === hoy.getMonth();
+                    })
+                    .map(colaborador => colaborador.nombre);
+            };            
+    
+            const enviarCorreoCumpleanieros = async () => {
+                const colaboradores = await Colaborador.findAll(); // Se obtienen todos los colaboradores
+                const nombresCumpleanieros = nombresCumpleanierosHoy(colaboradores);
+    
+                // Verificar si hay cumpleañeros hoy
+                if (nombresCumpleanieros.length === 0) {
+                    console.log('No hay cumpleañeros hoy');
+                    return;
+                }
+    
+                const listaCorreos = colaboradores.map(colaborador => ({  // recuperamos todos los colaboradores y buscamos que se envien los mensajes
+                    correo: colaborador.correoElectronico,
+                    mensaje: nombresCumpleanieros.includes(colaborador.nombre)
+                        ? `<h2>¡Feliz Cumpleaños, ${colaborador.nombre}!</h2><p>Queremos desearte un día lleno de alegría y felicidad en tu cumpleaños. ¡Que todos tus deseos se hagan realidad!</p>`
+                        : `<h2>¡Celebramos juntos!</h2>
+                        <p>Hoy es un día especial, ¡celebramos el cumpleaños de algunos de nuestros colaboradores! Te invitamos a unirte a nosotros en esta celebración:</p>
+                        <ul>
+                            ${nombresCumpleanieros.map(nombre => `<li>${nombre}</li>`).join('')}
+                        </ul>
+                        `
+                }));
+
+                const from = "Informacion relevante";
+    
+                for (const { correo, mensaje } of listaCorreos) {
+                    await enviarCorreo([correo], '¡Feliz Cumpleaños!', mensaje, from); // Llamar a la función de envío de correos para enviar la notificación
+                }
+    
+                console.log('Correos enviados correctamente');
+            };
+    
+            const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
+                const ahora = new Date();
+                let horaDeseada = new Date(
+                    ahora.getFullYear(),
+                    ahora.getMonth(),
+                    ahora.getDate(),
+                    hora,
+                    minuto,
+                    0,
+                    0
+                );
+            
+                if (ahora > horaDeseada) {
+                    // Si la hora deseada ya pasó hoy, programarla para mañana
+                    console.log('Programar la siguiente ejecución para:', horaDeseada);
+                    horaDeseada.setDate(horaDeseada.getDate() + 1);
+                }
+            
+                // Calcular el tiempo restante para la próxima ejecución
+                const tiempoParaEjecutar = horaDeseada - ahora;
+            
+                // Programar la ejecución de la función usando setTimeout
+                setTimeout(() => {
+                    funcion();
+                    // Programar la siguiente ejecución para mañana
+                    ejecutarFuncionDiaria(hora, minuto, funcion);
+                }, tiempoParaEjecutar);
+            };
+            
+    
+            // Configurar la hora y el minuto deseados para enviar el correo
+            const horaDeseada = 15; // 03:00 AM
+            const minutoDeseado = 10;
+    
+            // Ejecutar la función una vez al día a la hora deseada
+            ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreoCumpleanieros);
+        } catch (error) {
+            console.error('Ocurrió un error:', error.message);
+        }
+    })();
     
