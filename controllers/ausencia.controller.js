@@ -150,7 +150,7 @@ exports.getAllAusenciasPorColaborador = (req, res) => {
         });
       } else {
         res.send(data);
-        next();
+        //next();
       }
     })
     .catch(err => {

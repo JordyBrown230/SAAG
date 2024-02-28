@@ -42,7 +42,7 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
         },
         agenteUsuario: {
-            type: Sequelize.STRING(45),
+            type: Sequelize.STRING(255),
             allowNull: false,
         },
     }, {
