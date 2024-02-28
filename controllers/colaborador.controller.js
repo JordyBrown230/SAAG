@@ -221,7 +221,7 @@
     
                 const listaCorreos = colaboradores.map(colaborador => ({  // recuperamos todos los colaboradores y buscamos que se envien los mensajes
                     correo: colaborador.correoElectronico,
-                    mensaje: nombresCumpleanieros.includes(colaborador.nombre)
+                    mensaje: nombresCumpleanieros.includes(colaborador.nombre)   // seleccion de mensaje a mostrar segun si esta de cumpleaños o no
                         ? `<h2>¡Feliz Cumpleaños, ${colaborador.nombre}!</h2><p>Queremos desearte un día lleno de alegría y felicidad en tu cumpleaños. ¡Que todos tus deseos se hagan realidad!</p>`
                         : `<h2>¡Celebramos juntos!</h2>
                         <p>Hoy es un día especial, ¡celebramos el cumpleaños de algunos de nuestros colaboradores! Te invitamos a unirte a nosotros en esta celebración:</p>
@@ -240,7 +240,7 @@
                 console.log('Correos enviados correctamente');
             };
     
-            const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
+            const ejecutarFuncionDiaria = (hora, minuto, funcion) => {  // definicion horaria para asignar al siguiente dia
                 const ahora = new Date();
                 let horaDeseada = new Date(
                     ahora.getFullYear(),
@@ -255,7 +255,7 @@
                 if (ahora > horaDeseada) {
                     // Si la hora deseada ya pasó hoy, programarla para mañana
                     console.log('Programar la siguiente ejecución para:', horaDeseada);
-                    horaDeseada.setDate(horaDeseada.getDate() + 1);
+                    horaDeseada.setDate(horaDeseada.getDate() + 1);      // asignacion para el siguiente dia
                 }
             
                 // Calcular el tiempo restante para la próxima ejecución
@@ -264,7 +264,7 @@
                 // Programar la ejecución de la función usando setTimeout
                 setTimeout(() => {
                     funcion();
-                    // Programar la siguiente ejecución para mañana
+                    // Programar la siguiente ejecución para cierta hora
                     ejecutarFuncionDiaria(hora, minuto, funcion);
                 }, tiempoParaEjecutar);
             };
