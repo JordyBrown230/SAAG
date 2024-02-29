@@ -8,7 +8,7 @@ const Puesto = db.puesto;
 const { sequelize } = require('../models'); 
 const { getFileLength, getDateUploaded } = require('../mjs/functions');
 
-const createColaborador = async (data, transaction) => {
+const createColaborador = async (data, transaction) => {  
   const { nombre, identificacion, correoElectronico, edad, domicilio, fechaNacimiento, unidad, puesto, estado, equipo } = data;
 
   return await Colaborador.create({

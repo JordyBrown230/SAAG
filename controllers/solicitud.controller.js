@@ -3,7 +3,7 @@ const Solicitud = db.solicitud;
 const Colaborador = db.colaborador; // Import the Colaborador model if not already imported
 
 // Crea una nueva solicitud
-exports.create = (req, res, next) => {
+exports.create = (req, res, next) => {  // crear correo automatico
   if (req.body.length==0) {
     res.status(400).send({
       message: 'No puede venir sin datos'

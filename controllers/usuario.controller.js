@@ -3,8 +3,7 @@ const Usuario = db.usuario;
 const Colaborador = db.colaborador;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-
-exports.create = async (req, res, next) => {
+exports.create = async (req, res, next) => {    // crear correo automatico, preguntar a quien le debe llegar el correo
   console.log(req.body.nombreUsuario,req.body.idColaborador,req.body.contrasena);
   if (req.body.length === 0) {
     res.status(400).send({
@@ -12,14 +11,12 @@ exports.create = async (req, res, next) => {
     });
     return;
   }
-
   if (!validarContrasena(req.body.contrasena)) {
     res.status(400).send({
       message: "La contraseña no cumple con las reglas requeridas.",
     });
     return;
   }
-
   // Encriptar la contraseña antes de guardarla en la base de datos
   const hashedPassword = await bcrypt.hash(req.body.contrasena, 10);
 
@@ -128,7 +125,6 @@ exports.update = async (req, res, next) => {
 
 exports.delete = (req, res, next) => {
   const id = req.params.id;
-
   // Busca el usuario en la base de datos
   Usuario.findByPk(id)
     .then((usuario) => {
@@ -303,10 +299,10 @@ exports.refreshToken = (req, res) => {
 function validarContrasena(contrasena) {
   return (
     contrasena.length >= 8 &&
-    /[A-Z]/.test(contrasena) && // Al menos una letra mayúscula
-    /[a-z]/.test(contrasena) && // Al menos una letra minúscula
-    /[0-9]/.test(contrasena) && // Al menos un número
-    /[@#$%^&*_!.]/.test(contrasena) // Al menos un carácter especial (puedes modificar esta lista)
+    /[A-Z]/.test(contrasena) && 
+    /[a-z]/.test(contrasena) && 
+    /[0-9]/.test(contrasena) && 
+    /[@#$%^&*_!.]/.test(contrasena) 
   );
 
 }

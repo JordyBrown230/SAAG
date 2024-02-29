@@ -13,7 +13,7 @@ exports.create = (req, res) => {
     return;
   }
   // Crea una nueva ausencia
-  Ausencia.create(req.body)
+  Ausencia.create(req.body)  // crear e envio de correos?
     .then(data => {
       res.status(200).send({
         message: `Agregada correctamente la ausencia de ${req.body.nombreColaborador}`

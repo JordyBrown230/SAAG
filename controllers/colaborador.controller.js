@@ -271,7 +271,7 @@
             
     
             // Configurar la hora y el minuto deseados para enviar el correo
-            const horaDeseada = 15; // 03:00 AM
+            const horaDeseada = 15; // 03:00 AM la mejor hora para hacerlo
             const minutoDeseado = 10;
     
             // Ejecutar la función una vez al día a la hora deseada

@@ -1,7 +1,7 @@
 const db = require('../models');
 const HorasExtras = db.horasExtra;
 
-exports.createHorasExtras = async (req, res) => {
+exports.createHorasExtras = async (req, res) => {  // se debe realizar correo?
     try {
         if (Object.keys(req.body).length === 0) {
             return res.status(400).send({

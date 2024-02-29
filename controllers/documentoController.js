@@ -23,7 +23,7 @@ exports.getDocsEmployee = async (req, res) => {
 };
 
 
-exports.uploadPdf = async (req, res) => {
+exports.uploadPdf = async (req, res) => {  // agregar el enviar correo 
     try {
         if (!req.files || req.files.length === 0) {
             res.status(400).send({
