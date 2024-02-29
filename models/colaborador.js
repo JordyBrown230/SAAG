@@ -24,10 +24,6 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
             unique: true
         },
-        edad: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
         domicilio: {
             type: Sequelize.STRING(250),
             allowNull: false
