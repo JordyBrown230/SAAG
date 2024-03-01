@@ -58,6 +58,7 @@
                 message: `Agregado correctamente el colaborador ${req.body.nombre}`,
                 data: nuevoColaborador
             });
+            next();
         } catch (error) {
             res.status(500).send({
                 message: error.message || 'Ocurrió un error al crear el colaborador.'
