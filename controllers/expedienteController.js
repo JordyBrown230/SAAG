@@ -113,8 +113,9 @@ exports.updateColabadorExpediente = async (req, res) => {
     
     console.log('Actualización exitosa');
     res.status(200).send({
-      message: 'Actualización exitosa!'
+      message: 'Actualización exitosa!'   
     });
+    next();
   } catch (error) {
     // En caso de error, realizar un rollback
     await t.rollback();

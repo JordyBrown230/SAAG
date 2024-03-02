@@ -15,15 +15,12 @@ exports.createAuditTable = async (req, res, datos, direccionIp, agenteUsuario) =
     const nombreUsuario =  req.user.nombreUsuario;
     const rol =  req.user.rol;
     const metodo = req.method;
-    const urlCompleta = req.originalUrl;
-    const url = urlCompleta.slice(6);
+    const url = req.originalUrl;
     let datosAntiguos = null;
     let datosNuevos = null;
-    let accion = null;
 
     if(metodo === 'POST'){
      datosNuevos = Object.entries(req.body).map(([clave, valor]) => `${clave}: ${valor}`).join(', ');
-     accion = "creacion";
 
     }
     if(metodo === 'PUT'){
@@ -44,19 +41,17 @@ exports.createAuditTable = async (req, res, datos, direccionIp, agenteUsuario) =
     datosAntiguos = Object.entries(datosFiltrados).map(([clave, valor]) => `${clave}: ${valor}`).join(', ');
     datosNuevos = Object.entries(datosFiltrados2).map(([clave, valor]) => `${clave}: ${valor}`).join(', ');
 
-    accion = "actualizacion";
 
     }
     if(metodo === 'DELETE'){
       datosAntiguos = Object.entries(datos).map(([clave, valor]) => `${clave}: ${valor}`).join(', ');
-      accion = "eliminacion";
     }
 
     Auditoria.create({
         idUsuario,
         nombreUsuario,
         rol,
-        accion,
+        metodo,
         url,
         datosAntiguos,
         datosNuevos,
