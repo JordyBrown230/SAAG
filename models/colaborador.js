@@ -48,6 +48,14 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING(50),
             allowNull: false
         },
+        fechaIngreso: {
+            type: Sequelize.DATEONLY,
+            allowNull: false
+        },
+        fechaSalida: {
+            type: Sequelize.DATEONLY,
+            allowNull: true
+        },
         idPuesto: {
             type: Sequelize.INTEGER,
             allowNull: true,
