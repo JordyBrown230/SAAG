@@ -1,5 +1,4 @@
 const iconv = require('iconv-lite');
-const moment = require('moment');
 const db = require('../models');
 const Colaborador = db.colaborador;
 const Documento = db.documento;
@@ -158,14 +157,15 @@ exports.deleteDocumento = (req, res) => {
     });
   });
 }
-/*
+
 (async () => {
   try {
+    console.log("hoy documentos");
     const documentosVencidos = (documentos) => {
       const hoy = new Date();
       return documentos
           .filter(documento => {
-              const vencimiento = new Date(documento.fechoVencimiento);
+              const vencimiento = new Date(documento.fechaVencimiento);
               const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
   
               return diasRestantes <= 0 && diasRestantes >= -90 &&
@@ -178,13 +178,12 @@ exports.deleteDocumento = (req, res) => {
         const enviarCorreos = async () => {
           const documentos = await Documento.findAll();
           const documentoVencido = documentosVencidos(documentos);
-          const identificadores = documentosVencidos.map(doc => doc.idColaborador);
-          const correos = await obtenerColaboradores(identificadores);
-      
           if (documentoVencido.length === 0) {
               console.log('No hay documentos vencidos');
               return;
           }
+          const identificadores = documentosVencidos.map(doc => doc.idColaborador);
+          const correos = await obtenerColaboradores(identificadores);
       
           const from = "Informacion relevante";
       
@@ -249,8 +248,8 @@ exports.deleteDocumento = (req, res) => {
       };
       
       // Configurar la hora y el minuto deseados para enviar el correo
-      const horaDeseada = 3; // 03:00 AM la mejor hora para hacerlo
-      const minutoDeseado = 1;
+      const horaDeseada = 17; // 03:00 AM la mejor hora para hacerlo
+      const minutoDeseado = 12;
 
       // Ejecutar la función una vez al día a la hora deseada
       ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreos);
@@ -260,4 +259,3 @@ exports.deleteDocumento = (req, res) => {
       console.error('Ocurrió un error:', error.message);
   }
 })();
-*/
