@@ -120,7 +120,6 @@ exports.delete = (req, res, next) => {
             res.send({
               message: 'La solicitud fue eliminada exitosamente'
             });
-            next();
           })
           .catch(err => {
             res.status(500).send({
