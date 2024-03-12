@@ -9,7 +9,7 @@ const { sequelize } = require('../models');
 const { getFileLength, getDateUploaded } = require('../mjs/functions');
 
 const createColaborador = async (data, transaction) => {  
-  const { nombre, identificacion, correoElectronico, edad, domicilio, fechaNacimiento, unidad, puesto, estado, equipo } = data;
+  const { nombre, identificacion, correoElectronico, edad, domicilio, tipoJornada, fechaNacimiento, unidad, puesto, estado, equipo } = data;
 
   return await Colaborador.create({
     nombre,
@@ -22,6 +22,7 @@ const createColaborador = async (data, transaction) => {
     idPuesto: puesto,
     estado: estado,
     equipo: equipo,
+    tipoJornada: tipoJornada
   }, { transaction });
 };
 
@@ -112,8 +113,9 @@ exports.updateColabadorExpediente = async (req, res) => {
     
     console.log('Actualización exitosa');
     res.status(200).send({
-      message: 'Actualización exitosa!'
+      message: 'Actualización exitosa!'   
     });
+    next();
   } catch (error) {
     // En caso de error, realizar un rollback
     await t.rollback();

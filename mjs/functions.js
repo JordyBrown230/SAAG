@@ -9,8 +9,8 @@ function getFileLength(length) {
 
 function getDateUploaded() {
   const fechaSubida = new Date();
-  const fechaFormateada = moment(fechaSubida).format('DD-MM-YYYY');
-  return fechaFormateada;
+  //const fechaFormateada = moment(fechaSubida).format('YYYY-MM-DD');
+  return fechaSubida;
 }
 
 module.exports = { getFileLength, getDateUploaded };

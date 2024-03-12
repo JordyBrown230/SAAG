@@ -58,6 +58,7 @@
                 message: `Agregado correctamente el colaborador ${req.body.nombre}`,
                 data: nuevoColaborador
             });
+            next();
         } catch (error) {
             res.status(500).send({
                 message: error.message || 'Ocurrió un error al crear el colaborador.'
@@ -197,37 +198,66 @@
     (async () => {
         console.log('Se envió'); // Verificación de carga del archivo
         try {
-            const nombresCumpleanierosHoy = (colaboradores) => {  // estraemos los colaboradores que cumplen  años
+            const nombresCumpleanierosHoy = (colaboradores) => {
                 const hoy = new Date();
                 return colaboradores
                     .filter(colaborador => {
-                        const fechaNacimiento = new Date(colaborador.fechaNacimiento);
-                        console.log(fechaNacimiento.getDay());
-                        console.log(fechaNacimiento.getDate());
-                        return (fechaNacimiento.getDate() + 1) === hoy.getDate() && fechaNacimiento.getMonth() === hoy.getMonth();
+                        // Obtener día y mes de la fecha de nacimiento
+                        const fechaNacimiento = colaborador.fechaNacimiento.split('-');
+                        const diaNacimiento = parseInt(fechaNacimiento[2], 10); // Día de nacimiento
+                        const mesNacimiento = parseInt(fechaNacimiento[1], 10) - 1; // Mes de nacimiento (restar 1 porque los meses se indexan desde 0)
+                        console.log("Día de nacimiento:", diaNacimiento);
+                        console.log("Mes de nacimiento:", mesNacimiento + 1); // Sumar 1 porque queremos mostrar el mes correctamente
+                        console.log("Día actual:", hoy.getDate(), "hoy");
+                        console.log("Mes actual:", hoy.getMonth() + 1);
+                        return diaNacimiento === hoy.getDate() && mesNacimiento === hoy.getMonth();
                     })
                     .map(colaborador => colaborador.nombre);
-            };            
-    
+            };           
+            
             const enviarCorreoCumpleanieros = async () => {
                 const colaboradores = await Colaborador.findAll(); // Se obtienen todos los colaboradores
                 const nombresCumpleanieros = nombresCumpleanierosHoy(colaboradores);
-    
                 // Verificar si hay cumpleañeros hoy
                 if (nombresCumpleanieros.length === 0) {
                     console.log('No hay cumpleañeros hoy');
                     return;
                 }
     
-                const listaCorreos = colaboradores.map(colaborador => ({  // recuperamos todos los colaboradores y buscamos que se envien los mensajes
+                const listaCorreos = colaboradores.map(colaborador => ({  // recuperamos todos los colaboradores y buscamos que se envien los mensajes   <img src="https://i.pinimg.com/564x/07/75/af/0775af7fad718add06f4ac8cf95520ea.jpg"  width: 600px; height: 400px;>
                     correo: colaborador.correoElectronico,
                     mensaje: nombresCumpleanieros.includes(colaborador.nombre)   // seleccion de mensaje a mostrar segun si esta de cumpleaños o no
-                        ? `<h2>¡Feliz Cumpleaños, ${colaborador.nombre}!</h2><p>Queremos desearte un día lleno de alegría y felicidad en tu cumpleaños. ¡Que todos tus deseos se hagan realidad!</p>`
-                        : `<h2>¡Celebramos juntos!</h2>
-                        <p>Hoy es un día especial, ¡celebramos el cumpleaños de algunos de nuestros colaboradores! Te invitamos a unirte a nosotros en esta celebración:</p>
+                        ? `<div style="background-image: url('https://i.pinimg.com/564x/f0/3a/05/f03a0519bdf8c1d14bb9304b5a1e6210.jpg'); background-size: cover; color: #EFB810; width: 600px; height: 500px; background-position: center bottom; text-align: right;">
+                        <div style="padding-top: 15px; margin-right: 20px;">
+                            <h2 style="font: oblique bold 120% cursive; color: #EFB810; font-size: 30px;">¡Feliz Cumpleaños, ${colaborador.nombre}!</h2>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="width: clamp(220px, 50%, 280%); margin-left: auto;">
+                                <div style="padding: 5px;">
+                                    <p>Como parte de ACIB, queremos desearte un día lleno de alegría y felicidad en tu cumpleaños.</p>
+                                </div>
+                                <div style="padding: 5px;">
+                                    <p>Que el Señor te bendiga y te guarde; que el Señor haga resplandecer su rostro sobre ti y tenga de ti misericordia; que el Señor alce sobre ti su rostro y ponga en ti paz." - Números 6:24-26</p>
+                                </div>
+                                <div style="padding: 5px;">
+                                    <p>¡Que todos tus deseos se hagan realidad!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                                                                  
+                        `: `<div style="background-image: url('https://i.pinimg.com/564x/2f/88/94/2f889402b9c4976d08a62ae051f073cd.jpg'); background-size: cover; color: #fcf264; width: 480px; height: 500px;">
+                        <p>
+                        <center style="padding-top: 145px;"></br></br></br>
+                        <h2 style="font: oblique bold 120% cursive; font-size: 40px;">¡${colaborador.nombre}, Comparte los Festejos!</h2>
+                        <p>En ACIB, queremos que disfrutes de un día lleno de alegría y felicidad junto a tus compañeros.</p>
+                        <h2>¡Celebremos juntos!</h2>
+                        <p>Hoy es un día especial, celebramos el cumpleaños de algunos de nuestros colaboradores. ¡Te invitamos a unirte a nosotros en esta celebración!</p>
                         <ul>
                             ${nombresCumpleanieros.map(nombre => `<li>${nombre}</li>`).join('')}
                         </ul>
+                        </center>
+                    </div>
+                    
                         `
                 }));
 
@@ -254,8 +284,9 @@
             
                 if (ahora > horaDeseada) {
                     // Si la hora deseada ya pasó hoy, programarla para mañana
-                    console.log('Programar la siguiente ejecución para:', horaDeseada);
                     horaDeseada.setDate(horaDeseada.getDate() + 1);      // asignacion para el siguiente dia
+                    console.log('Programar la siguiente ejecución para:', horaDeseada);
+
                 }
             
                 // Calcular el tiempo restante para la próxima ejecución
@@ -269,10 +300,9 @@
                 }, tiempoParaEjecutar);
             };
             
-    
             // Configurar la hora y el minuto deseados para enviar el correo
-            const horaDeseada = 15; // 03:00 AM la mejor hora para hacerlo
-            const minutoDeseado = 10;
+            const horaDeseada = 3; // 03:00 AM la mejor hora para hacerlo
+            const minutoDeseado = 1;
     
             // Ejecutar la función una vez al día a la hora deseada
             ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreoCumpleanieros);

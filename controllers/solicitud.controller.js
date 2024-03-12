@@ -150,7 +150,6 @@ exports.getAllSolicitudesPorColaborador = (req, res, next) => {
         });
       } else {
         res.send(data);
-        next();
       }
     })
     .catch(err => {
