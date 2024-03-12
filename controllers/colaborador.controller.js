@@ -58,7 +58,7 @@
                 message: `Agregado correctamente el colaborador ${req.body.nombre}`,
                 data: nuevoColaborador
             });
-            next();
+           // next();
         } catch (error) {
             res.status(500).send({
                 message: error.message || 'Ocurrió un error al crear el colaborador.'
@@ -89,7 +89,7 @@
             });
             } else {
             res.send(data);
-            next();
+            //next();
             }
         })
         .catch(err => {
@@ -118,7 +118,7 @@
                     message: `Actualizado correctamente el colaborador con ID ${id}`,
                     colaborador: colaborador
                 });
-                next();
+                //next();
                 })
                 .catch(err => {
                 res.status(500).send({
@@ -157,7 +157,7 @@
                 res.status(500).send({
                     message: err.message || `Ocurrió un error al eliminar el colaborador con ID ${id}`
                 });
-                next();
+                //next();
                 });
             }
         })
