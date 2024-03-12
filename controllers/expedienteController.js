@@ -76,6 +76,7 @@ exports.createColaboradorExpediente = async (req, res) => {
     });
 
     res.status(200).json({ message: 'Registro exitoso', expediente, colaborador: sanitizedColaborador, documentos: sanitizedDocumentos });
+
   } catch (error) {
     await t.rollback();
     console.error('Error en la transacción:', error.message);
@@ -115,7 +116,7 @@ exports.updateColabadorExpediente = async (req, res) => {
     res.status(200).send({
       message: 'Actualización exitosa!'   
     });
-    next();
+
   } catch (error) {
     // En caso de error, realizar un rollback
     await t.rollback();
@@ -249,6 +250,7 @@ exports.update = (req, res) => {
                 message: 'Expediente actualizado exitosamente!',
                 data: updatedExpediente,
               });
+              next();
           })
           .catch(err => {
             res.status(500).send({ error: 'Error al actualizar el expediente', details: err, status: '500' });

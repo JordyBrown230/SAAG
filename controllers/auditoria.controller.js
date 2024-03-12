@@ -15,15 +15,30 @@ exports.createAuditTable = async (req, res, datos, direccionIp, agenteUsuario) =
     const nombreUsuario =  req.user.nombreUsuario;
     const rol =  req.user.rol;
     const metodo = req.method;
-    const url = req.originalUrl;
+    const nombre = req.originalUrl.substring(6);
     let datosAntiguos = null;
     let datosNuevos = null;
+    let accion = null;
 
     if(metodo === 'POST'){
+      accion = "Creación";
+
+      const id = req.id;
+      console.log(req.body);
+
+      const keys = Object.keys(req.body);
+      // Verificar si hay al menos una clave en el objeto
+      if (keys.length > 0) {
+        // Reemplazar el valor del primer elemento con el ID
+        req.body[keys[0]] = id;
+      }
+
      datosNuevos = Object.entries(req.body).map(([clave, valor]) => `${clave}: ${valor}`).join(', ');
 
     }
+
     if(metodo === 'PUT'){
+      accion = "Actualización";
       let datosFiltrados = {};  
       Object.keys(req.body).forEach(key => {
         if(datos.hasOwnProperty(key) && req.body[key] !== datos[key]){
@@ -44,6 +59,7 @@ exports.createAuditTable = async (req, res, datos, direccionIp, agenteUsuario) =
 
     }
     if(metodo === 'DELETE'){
+      accion = "Eliminación";
       datosAntiguos = Object.entries(datos).map(([clave, valor]) => `${clave}: ${valor}`).join(', ');
     }
 
@@ -51,8 +67,8 @@ exports.createAuditTable = async (req, res, datos, direccionIp, agenteUsuario) =
         idUsuario,
         nombreUsuario,
         rol,
-        metodo,
-        url,
+        accion,
+        nombre,
         datosAntiguos,
         datosNuevos,
         direccionIp,

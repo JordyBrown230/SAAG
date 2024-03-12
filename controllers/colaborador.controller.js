@@ -3,7 +3,7 @@
     const Colaborador = db.colaborador;
     const Usuario = db.usuario;
   
-    exports.createColaborador = async (req, res) => {
+    exports.createColaborador = async (req, res, next) => {
         try {
             if (Object.keys(req.body).length === 0) {
                 return res.status(400).send({
@@ -53,11 +53,11 @@
                 </table>
             `;
             await enviarCorreo(toList, subject, htmlContent, from);  // forma de utilizar la funcion global
-    
             res.status(200).send({
                 message: `Agregado correctamente el colaborador ${req.body.nombre}`,
                 data: nuevoColaborador
             });
+            req.id = nuevoColaborador.idColaborador; 
             next();
         } catch (error) {
             res.status(500).send({
@@ -66,11 +66,11 @@
         }
     };
     
-    exports.findAllColaboradores = async (req, res) => {
+    exports.findAllColaboradores = async (req, res, next) => {
         Colaborador.findAll()
         .then(data => {
             res.send(data);
-        })
+        })  
         .catch(err => {
             res.status(500).send({
             message: err.message || 'Ocurrió un error al obtener los colaboradores.'
@@ -89,7 +89,6 @@
             });
             } else {
             res.send(data);
-            next();
             }
         })
         .catch(err => {
