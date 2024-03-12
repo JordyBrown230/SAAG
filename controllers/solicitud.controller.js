@@ -16,7 +16,8 @@ exports.create = (req, res, next) => {  // crear correo automatico
       res.status(200).send({
         message: `Agregada correctamente la solicitud de ${req.body.nombreColaborador}`,
         data:data
-      });     
+      });   
+      req.id = data.idSolicitud;  
       next();
     })
     .catch(err => {
@@ -54,7 +55,6 @@ exports.findOne = (req, res, next) => {
         });
       } else {
         res.send(data);
-        next();
       }
     })
     .catch(err => {
@@ -120,7 +120,6 @@ exports.delete = (req, res, next) => {
             res.send({
               message: 'La solicitud fue eliminada exitosamente'
             });
-            next();
           })
           .catch(err => {
             res.status(500).send({

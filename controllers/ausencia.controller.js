@@ -18,7 +18,6 @@ exports.create = (req, res) => {
       res.status(200).send({
         message: `Agregada correctamente la ausencia de ${req.body.nombreColaborador}`
       });     
-      next();
      })
     .catch(err => {
       res.status(500).send({
@@ -54,7 +53,6 @@ exports.findOne = (req, res) => {
         });
       } else {
         res.send(data);
-        next();
       }
     })
     .catch(err => {
@@ -83,7 +81,6 @@ exports.update = (req, res) => {
             res.status(200).send({
               message: `Actualizada correctamente la ausencia con ID ${id}`
             });
-            next();          
           })
           .catch(err => {
             res.status(500).send({
@@ -119,7 +116,6 @@ exports.delete = (req, res) => {
             res.send({
               message: 'La ausencia fue eliminada exitosamente'
             });
-            next();
           })
           .catch(err => {
             res.status(500).send({

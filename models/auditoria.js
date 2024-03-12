@@ -17,11 +17,11 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING(45),
             allowNull: false,
         },
-        metodo: {
+        accion: {
             type: Sequelize.STRING(20),
             allowNull: false,
         },
-        url : {
+        nombre : {
             type: Sequelize.STRING(45),
             allowNull: false,
         },

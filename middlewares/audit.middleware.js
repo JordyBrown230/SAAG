@@ -4,8 +4,8 @@ const {createAuditLogin, updateAuditLogin} = require('../controllers/auditoriaLo
 
 const auditTables = async (req, res, next) => {
 
-        try{           
-            const datos = req.datos
+        try{       
+            const datos = req.datos;
             const direccionIp = req.ip || req.connection.remoteAddress;
             const agenteUsuario = req.get('user-agent') || 'unknown';
             await createAuditTable(req, res, datos, direccionIp, agenteUsuario);
