@@ -88,4 +88,5 @@ describe("Pruebas para las rutas de ausencia", () => {
       "La ausencia fue eliminada exitosamente"
     );
   });
+
 });
