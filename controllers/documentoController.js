@@ -22,8 +22,11 @@ exports.getDocsEmployee = async (req, res) => {
 };
 
 
-exports.uploadPdf = async (req, res) => {  // agregar el enviar correo 
+exports.uploadPdf = async (req, res) => {  // agregar el enviar correo
     try {
+
+      const {idColaborador, licencia, curso, fechaVencimiento} = req.body;
+
         if (!req.files || req.files.length === 0) {
             res.status(400).send({
                 status: '400',
@@ -36,11 +39,14 @@ exports.uploadPdf = async (req, res) => {  // agregar el enviar correo
             const cadenaDecodificada = iconv.decode(Buffer.from(originalname, 'latin1'), 'utf-8');
             const length = getFileLength(buffer.length);
             const pdfFile = await Documento.create({
+                licencia: licencia,
+                curso: curso,
                 nombreArchivo: cadenaDecodificada,
                 archivo: buffer,
                 tamaño: length,
+                fechaVencimiento: fechaVencimiento,
                 fechaSubida: getDateUploaded(),
-                idColaborador: req.body.idColaborador
+                idColaborador: idColaborador
             });
             pdfFiles.push(pdfFile); 
         }

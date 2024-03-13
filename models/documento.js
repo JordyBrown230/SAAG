@@ -7,6 +7,14 @@ module.exports = (sequelize,Sequelize) => {
             primaryKey: true,
             allowNull: false
         },
+        licencia: {
+            type: Sequelize.STRING(200),
+            allowNull: true
+        },
+        curso: {
+            type: Sequelize.STRING(200),
+            allowNull: true
+        },
         nombreArchivo: {
             type: Sequelize.STRING(100),
             allowNull: false

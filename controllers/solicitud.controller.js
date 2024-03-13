@@ -30,7 +30,18 @@ exports.create = (req, res, next) => {  // crear correo automatico
 
 
 exports.findAll = (req,res, next) => { //en Express.js toman dos argumentos: req (la solicitud) y res (la respuesta).
-  Solicitud.findAll()
+  Solicitud.findAll({
+    include: [
+      { 
+        model: Colaborador,
+         as: 'colaborador' ,
+         attributes: {
+         exclude: ['fotoCarnet']
+        }
+     }
+    ],
+
+  })
     .then(data => {
       res.send(data);
     })

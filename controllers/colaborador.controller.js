@@ -2,6 +2,7 @@
     const db = require('../models');
     const Colaborador = db.colaborador;
     const Usuario = db.usuario;
+    const Puesto = db.puesto;
   
     exports.createColaborador = async (req, res, next) => {
 
@@ -72,7 +73,14 @@
     };
     
     exports.findAllColaboradores = async (req, res, next) => {
-        Colaborador.findAll()
+        Colaborador.findAll({
+            include: [
+                {
+                    model: Puesto,
+                    as: 'puesto',
+                }
+            ]
+        })
         .then(data => {
             res.send(data);
         })  
@@ -86,7 +94,14 @@
     exports.findOneColaborador = async (req, res) => {
         const id = req.params.id;
     
-        Colaborador.findByPk(id)
+        Colaborador.findByPk(id, {
+            include: [
+                {
+                    model: Puesto,
+                    as: 'puesto',
+                }
+            ]
+        })
         .then(data => {
             if (!data) {
             res.status(404).send({
@@ -122,7 +137,7 @@
                     message: `Actualizado correctamente el colaborador con ID ${id}`,
                     colaborador: colaborador
                 });
-                //next();
+                next();
                 })
                 .catch(err => {
                 res.status(500).send({
