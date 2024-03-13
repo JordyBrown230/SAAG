@@ -99,7 +99,7 @@ exports.getPhotoCarnetById = async (req, res) => {
       res.setHeader('Content-Type', contentType);
       res.send(colaborador.fotoCarnet);
   } catch (error) {
-      console.error(error);
+      console.error(errorerror);
       return res.status(500).json({ message: 'Error interno del servidor' });
   }
 };

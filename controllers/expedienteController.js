@@ -163,7 +163,7 @@ exports.getEmployeeExpedient = (req, res) =>{
 
 };
 
-exports.create = (req, res) => {
+exports.create = (req, res, next) => {
 
     const errorMensaje = validarCamposNoNulos(req);
     if (errorMensaje) {
@@ -181,6 +181,8 @@ exports.create = (req, res) => {
             status: '200',
             data: data
         });
+        req.id = data.idExpediente;  
+        next();
       })
       .catch(err => {
         res.json({
@@ -237,10 +239,11 @@ exports.findOne = (req, res) => {
       });
 };
 
-exports.update = (req, res) => {
+exports.update = (req, res, next) => {
     const id = req.params.id;
     const newData = req.body; 
   
+    
     obtenerExpedientePorID(id) 
       .then(expediente => {
         expediente.update(newData)
@@ -250,6 +253,7 @@ exports.update = (req, res) => {
                 message: 'Expediente actualizado exitosamente!',
                 data: updatedExpediente,
               });
+              req.datos = {...expediente.get()};
               next();
           })
           .catch(err => {

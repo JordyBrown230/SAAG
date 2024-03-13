@@ -19,13 +19,11 @@ exports.createAuditTable = async (req, res, datos, direccionIp, agenteUsuario) =
     let datosAntiguos = null;
     let datosNuevos = null;
     let accion = null;
-
+ 
     if(metodo === 'POST'){
       accion = "Creación";
-
       const id = req.id;
-      console.log(req.body);
-
+  
       const keys = Object.keys(req.body);
       // Verificar si hay al menos una clave en el objeto
       if (keys.length > 0) {

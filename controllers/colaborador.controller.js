@@ -4,13 +4,21 @@
     const Usuario = db.usuario;
   
     exports.createColaborador = async (req, res, next) => {
-        try {
+
             if (Object.keys(req.body).length === 0) {
                 return res.status(400).send({
                     message: 'No puede venir sin datos'
                 });
             }
-            const nuevoColaborador = await Colaborador.create(req.body);
+
+            Colaborador.create(req.body)
+                .then(async data => {
+                    res.status(200).send({
+                    message: `Agregada correctamente la solicitud de ${req.body.nombre}`,
+                    data:data
+            }); 
+            req.id = data.idColaborador; 
+            next();
             //datos que se vana a necesitar, basicamente definimos correos y demas
             const from = '"Se agregó como un nuevo colaborador" <dgadeaio4@gmail.com>';
             const toList = [req.body.correoElectronico];  // el otro correo es de prueba para ver si se puede hacer con mas de uno, tienen que cambiarlo, ademas de que eso hace que se cree una lista de correos
@@ -53,16 +61,14 @@
                 </table>
             `;
             await enviarCorreo(toList, subject, htmlContent, from);  // forma de utilizar la funcion global
-            res.status(200).send({
-                message: `Agregado correctamente el colaborador ${req.body.nombre}`,
-                data: nuevoColaborador
-            });
-           // next();
-        } catch (error) {
-            res.status(500).send({
-                message: error.message || 'Ocurrió un error al crear el colaborador.'
-            });
-        }
+            
+        })
+            .catch(err => {
+                res.status(500).send({
+                  message:
+                    err.message || 'Ocurrió un error al crear la solicitud.'
+                });
+              });
     };
     
     exports.findAllColaboradores = async (req, res, next) => {
@@ -97,7 +103,7 @@
         });
     };
 
-    exports.updateColaborador = async (req, res) => {
+    exports.updateColaborador = async (req, res,next) => {
         const id = req.params.id;
     
         Colaborador.findByPk(id)
@@ -132,7 +138,7 @@
         });
     };
 
-    exports.deleteColaborador = async (req, res) => {
+    exports.deleteColaborador = async (req, res, next) => {
         const id = req.params.id;
     
         Colaborador.findByPk(id)
