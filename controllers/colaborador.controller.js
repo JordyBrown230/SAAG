@@ -243,10 +243,10 @@
                     return;
                 }
     
-                const listaCorreos = colaboradores.map(colaborador => ({  // recuperamos todos los colaboradores y buscamos que se envien los mensajes   <img src="https://i.pinimg.com/564x/07/75/af/0775af7fad718add06f4ac8cf95520ea.jpg"  width: 600px; height: 400px;>
+                const listaCorreos = colaboradores.map(colaborador => ({  // recuperamos todos los colaboradores y buscamos que se envien los mensajes   
                     correo: colaborador.correoElectronico,
                     mensaje: nombresCumpleanieros.includes(colaborador.nombre)   // seleccion de mensaje a mostrar segun si esta de cumpleaños o no
-                        ? `<div style="background-image: url('https://i.pinimg.com/564x/f0/3a/05/f03a0519bdf8c1d14bb9304b5a1e6210.jpg'); background-size: cover; color: #EFB810; width: 600px; height: 500px; background-position: center bottom; text-align: right;">
+                        ? `<div style="background-image: url('https://i.pinimg.com/564x/f4/af/88/f4af8848b315b9a69990e6bf51f148c1.jpg'); background-size: cover; color: #EFB810; width: 600px; height: 800px; background-position: center bottom; text-align: right;">
                         <div style="padding-top: 15px; margin-right: 20px;">
                             <h2 style="font: oblique bold 120% cursive; color: #EFB810; font-size: 30px;">¡Feliz Cumpleaños, ${colaborador.nombre}!</h2>
                         </div>
@@ -264,7 +264,7 @@
                             </div>
                         </div>
                     </div>                                                                  
-                        `: `<div style="background-image: url('https://i.pinimg.com/564x/2f/88/94/2f889402b9c4976d08a62ae051f073cd.jpg'); background-size: cover; color: #fcf264; width: 480px; height: 500px;">
+                        `: `<div style="background-image: url('https://i.pinimg.com/564x/20/c0/dc/20c0dc691b73663021e7c6642abad5bc.jpg'); background-size: cover; color: #fcf264; width: 480px; height: 800px;">
                         <p>
                         <center style="padding-top: 145px;"></br></br></br>
                         <h2 style="font: oblique bold 120% cursive; font-size: 40px;">¡${colaborador.nombre}, Comparte los Festejos!</h2>
@@ -283,13 +283,13 @@
                 const from = "Informacion relevante";
     
                 for (const { correo, mensaje } of listaCorreos) {
-                    await enviarCorreo([correo], '¡Feliz Cumpleaños!', mensaje, from); // Llamar a la función de envío de correos para enviar la notificación
+                    await enviarCorreo([correo], '¡Feliz Cumpleaños!', mensaje, from); 
                 }
     
                 console.log('Correos enviados correctamente');
             };
     
-            const ejecutarFuncionDiaria = (hora, minuto, funcion) => {  // definicion horaria para asignar al siguiente dia
+            const ejecutarFuncionDiaria = (hora, minuto, funcion) => { 
                 const ahora = new Date();
                 let horaDeseada = new Date(
                     ahora.getFullYear(),
