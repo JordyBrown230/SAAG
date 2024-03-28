@@ -245,38 +245,35 @@
     
                 const listaCorreos = colaboradores.map(colaborador => ({  // recuperamos todos los colaboradores y buscamos que se envien los mensajes   
                     correo: colaborador.correoElectronico,
-                    mensaje: nombresCumpleanieros.includes(colaborador.nombre)   // seleccion de mensaje a mostrar segun si esta de cumpleaños o no
-                        ? `<div style="background-image: url('https://i.pinimg.com/564x/f4/af/88/f4af8848b315b9a69990e6bf51f148c1.jpg'); background-size: cover; color: #EFB810; width: 600px; height: 800px; background-position: center bottom; text-align: right;">
-                        <div style="padding-top: 15px; margin-right: 20px;">
-                            <h2 style="font: oblique bold 120% cursive; color: #EFB810; font-size: 30px;">¡Feliz Cumpleaños, ${colaborador.nombre}!</h2>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="width: clamp(220px, 50%, 280%); margin-left: auto;">
-                                <div style="padding: 5px;">
-                                    <p>Como parte de ACIB, queremos desearte un día lleno de alegría y felicidad en tu cumpleaños.</p>
-                                </div>
-                                <div style="padding: 5px;">
-                                    <p>Que el Señor te bendiga y te guarde; que el Señor haga resplandecer su rostro sobre ti y tenga de ti misericordia; que el Señor alce sobre ti su rostro y ponga en ti paz." - Números 6:24-26</p>
-                                </div>
-                                <div style="padding: 5px;">
-                                    <p>¡Que todos tus deseos se hagan realidad!</p>
-                                </div>
+                    mensaje: nombresCumpleanieros.includes(colaborador.nombre)   // seleccion de mensaje a mostrar segun si esta de cumpleaños o no 
+
+                        ? `<div style="width: 600px; height: 800px; background-image: url('https://i.pinimg.com/564x/f4/af/88/f4af8848b315b9a69990e6bf51f148c1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center center; color: #001F3F; text-align: center;">
+                        <div style="margin: 0 auto; max-width: 80%;">
+                            <div style="padding-top: 170px;">
+                                <h2 style="font: oblique bold 120% cursive; color: black; font-size: 30px;">¡Feliz Cumpleaños, ${colaborador.nombre}!</h2>
+                            </div>
+                            <div style="padding: 5px; font-size: 20px;">
+                                <p>Como parte de ACIB, queremos desearte un día lleno de alegría y felicidad en tu cumpleaños.</p>
+                            </div>
+                            <div style="padding: 5px; font-size: 18px;">
+                                <p>Que el Señor te bendiga y te guarde; que el Señor haga resplandecer su rostro sobre ti y tenga de ti misericordia; que el Señor alce sobre ti su rostro y ponga en ti paz." - Números 6:24-26</p>
+                            </div>
+                            <div style="padding: 5px; font-size: 14px;">
+                                <p>¡Que todos tus deseos se hagan realidad!</p>
                             </div>
                         </div>
-                    </div>                                                                  
-                        `: `<div style="background-image: url('https://i.pinimg.com/564x/20/c0/dc/20c0dc691b73663021e7c6642abad5bc.jpg'); background-size: cover; color: #fcf264; width: 480px; height: 800px;">
-                        <p>
-                        <center style="padding-top: 145px;"></br></br></br>
-                        <h2 style="font: oblique bold 120% cursive; font-size: 40px;">¡${colaborador.nombre}, Comparte los Festejos!</h2>
-                        <p>En ACIB, queremos que disfrutes de un día lleno de alegría y felicidad junto a tus compañeros.</p>
-                        <h2>¡Celebremos juntos!</h2>
-                        <p>Hoy es un día especial, celebramos el cumpleaños de algunos de nuestros colaboradores. ¡Te invitamos a unirte a nosotros en esta celebración!</p>
-                        <ul>
-                            ${nombresCumpleanieros.map(nombre => `<li>${nombre}</li>`).join('')}
-                        </ul>
-                        </center>
-                    </div>
-                    
+                    </div>                                                                                                                                                                  
+                        `: `<div style="background-image: url('https://i.pinimg.com/564x/20/c0/dc/20c0dc691b73663021e7c6642abad5bc.jpg'); background-size: cover; color: #001F3F; width: 480px; height: 800px; text-align: center;">
+                        <div style="margin: 0 auto; max-width: 80%; padding-top: 145px;">
+                            <h2 style="font: oblique bold 120% cursive; font-size: 40px;">¡${colaborador.nombre}, Comparte los Festejos!</h2>
+                            <p>En ACIB, queremos que disfrutes de un día lleno de alegría y felicidad junto a tus compañeros.</p>
+                            <h2>¡Celebremos juntos!</h2>
+                            <p>Hoy es un día especial, celebramos el cumpleaños de algunos de nuestros colaboradores. ¡Te invitamos a unirte a nosotros en esta celebración!</p>
+                            <ul style="list-style-type: none; padding: 0;">
+                                ${nombresCumpleanieros.map(nombre => `<li>${nombre}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>                    
                         `
                 }));
 
