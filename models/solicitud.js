@@ -65,6 +65,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(250),
         allowNull: true,
       },
+      fechaRecibido: {
+        type: Sequelize.DATEONLY,
+        allowNull: true,
+      },
       idColaborador: {
         type: Sequelize.INTEGER,
         allowNull: false
