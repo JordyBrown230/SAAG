@@ -3,6 +3,8 @@ const Usuario = db.usuario;
 const Colaborador = db.colaborador;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const Puesto = db.puesto;
+
 exports.create = async (req, res, next) => {    // crear correo automatico, preguntar a quien le debe llegar el correo
   console.log(req.body.nombreUsuario,req.body.idColaborador,req.body.contrasena);
   if (req.body.length === 0) {
@@ -169,6 +171,12 @@ exports.login = async (req, res,next) => {
       {
         model: Colaborador,
         as: 'colaborador',
+        include: [
+          {
+            model: Puesto,
+            as: 'puesto'          
+          }
+        ]
       },
     ], })
     .then(async (usuario) => {
