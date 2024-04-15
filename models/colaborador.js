@@ -60,6 +60,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             allowNull: true,
         },
+        idColaborador_fk: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
     }, {
         tableName: 'Colaborador',
         timestamps: false
@@ -68,6 +72,11 @@ module.exports = (sequelize, Sequelize) => {
     Colaborador.belongsTo(sequelize.models.Puesto, {
         foreignKey: 'idPuesto',
         as: 'puesto'
+    });
+
+    Colaborador.belongsTo(sequelize.models.Colaborador, {
+        foreignKey: 'idColaborador_fk',
+        as: 'supervisor'
     });
     
     return Colaborador;

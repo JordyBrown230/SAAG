@@ -175,6 +175,11 @@ exports.login = async (req, res,next) => {
           {
             model: Puesto,
             as: 'puesto'          
+          },
+          {
+            model: Colaborador,
+            as: 'supervisor',
+            required: false // no todos los colaboradores tienen un supervisor
           }
         ]
       },
@@ -228,19 +233,19 @@ exports.login = async (req, res,next) => {
       });
 
       const colaborador = usuario.colaborador;
-
+      const supervisor = colaborador.supervisor; // Supervisor del usuario
+      const nombreSupervisor = supervisor ? supervisor.nombre : null;
 
       req.exito = true;
       req.token = refreshToken;
       next();
 
-      res.json({colaborador, accessToken, refreshToken});
+      res.json({colaborador,supervisor: nombreSupervisor, accessToken, refreshToken});
     })
     .catch((err) => {
-      res.status(500).json({ message: "Error interno del servidor" });
-    });
-    
-    
+      console.log(err)
+      res.status(500).json({ message: `Error interno del servidor: ${err}` });
+    }); 
 };
 
 exports.logout = (req, res, next) => {
