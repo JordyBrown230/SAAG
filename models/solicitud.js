@@ -58,7 +58,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       estado: {
-        type: Sequelize.STRING(15),
+        type: Sequelize.STRING(100),
         allowNull: false,
       },
       comentarioTalentoHumano: {

@@ -10,6 +10,8 @@ router.put('/actualizar-solicitud/:id', authenticateToken, solicitudController.u
 
 router.get('/solicitudes/', authenticateToken, authorizeRoles(['admin']), solicitudController.findAll);
 
+router.get('/solicitudes-por-supervisor/:id', authenticateToken, authorizeRoles(['supervisor']), solicitudController.findAllBySupervisor);
+
 router.get('/solicitud/:id', authenticateToken, authorizeRoles(['admin']), solicitudController.findOne);
 
 router.get('/solicitudes-por-colaborador/:id', authenticateToken, authorizeRoles(['admin']), solicitudController.getAllSolicitudesPorColaborador);

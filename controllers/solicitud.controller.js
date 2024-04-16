@@ -53,6 +53,35 @@ exports.findAll = (req,res, next) => { //en Express.js toman dos argumentos: req
     });
 };
 
+exports.findAllBySupervisor = (req, res, next) => {
+  const idSupervisor = req.params.id; // Supongamos que recibes el ID del supervisor desde el front-end
+
+  Solicitud.findAll({
+    include: [
+      {
+        model: Colaborador,
+        as: 'colaborador',
+        attributes: {
+          exclude: ['fotoCarnet']
+        },
+        where: {
+          idColaborador_fk: idSupervisor 
+        }
+      }
+    ]
+  })
+    .then(data => {
+      console.log(data);
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || 'Ocurrió un error al obtener las solicitudes.'
+      });
+    });
+};
+
+
 // Obtiene una solicitud por ID
 exports.findOne = (req, res, next) => {
   const id = req.params.id;
@@ -99,7 +128,7 @@ exports.update = (req, res, next) => {
           })
           .catch(err => {
             res.status(500).send({
-              message: `Ocurrió un error al actualizar la solicitud con ID ${id}: ${err.message}`
+              message: `Ocurrió un error al actualizar la solicitud con ID ${id}: ${err.message}`,
             });
           });
       }
