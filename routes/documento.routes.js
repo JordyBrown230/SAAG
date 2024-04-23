@@ -7,6 +7,8 @@ const { authenticateToken, authorizeRoles } = require('../middlewares/auth.middl
 const storage = multer.memoryStorage();
 const upload = multer({ storage, encoding: 'utf-8' });
 
+router.get('/documentos/', authenticateToken, authorizeRoles(['admin']), documentoController.findAll);
+
 router.delete('/eliminar-documento/:id', documentoController.deleteDocumento);
 
 router.post('/documentos/registrar-documento', upload.array('file', 10), documentoController.uploadPdf);
