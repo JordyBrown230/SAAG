@@ -91,6 +91,45 @@
         });
     };
 
+
+    exports.findAllColaboradoresWithUser = async (req, res, next) => {
+        try {
+            const colaboradores = await Colaborador.findAll({
+                include: [
+                    {
+                        model: Puesto,
+                        as: 'puesto',
+                    }
+                ],
+                attributes: { exclude: ['fotoCarnet'] } 
+            });
+    
+            const colaboradoresConUsuario = await Promise.all(colaboradores.map(async (colaborador) => {
+                if (colaborador.idColaborador !== undefined) { // Verificar si el ID del colaborador está definido
+                    const usuario = await Usuario.findOne({ where: { idColaborador: colaborador.idColaborador } });
+                    return {
+                        colaborador: colaborador,
+                        usuario: usuario
+                    };
+                } else {
+                    return {
+                        colaborador: colaborador,
+                        usuario: null 
+                    };
+                }
+            }));
+    
+            res.send(colaboradoresConUsuario);
+        } catch (err) {
+            res.status(500).send({
+                message: err.message || 'Ocurrió un error al obtener los colaboradores.'
+            });
+        }
+    };
+    
+    
+
+
     exports.findOneColaborador = async (req, res) => {
         const id = req.params.id;
     

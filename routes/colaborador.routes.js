@@ -9,6 +9,8 @@ router.put('/actualizar-colaborador/:id', authenticateToken, authorizeRoles(['ad
 
 router.get('/colaboradores/', authenticateToken, authorizeRoles(['admin']), colaboradorController.findAllColaboradores);
 
+router.get('/colaboradores-with-user/', authenticateToken, authorizeRoles(['admin']), colaboradorController.findAllColaboradoresWithUser);
+
 router.delete('/eliminar-colaborador/:id', authenticateToken, authorizeRoles(['admin']), colaboradorController.deleteColaborador);
 
 router.get('/colaborador/:id', authenticateToken, authorizeRoles(['admin']), colaboradorController.findOneColaborador);
