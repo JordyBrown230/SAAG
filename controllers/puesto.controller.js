@@ -1,24 +1,29 @@
 const db = require('../models');
 const Puesto = db.puesto;
 
-exports.createPuesto = async (req, res) => {
-    try {
-        if (Object.keys(req.body).length === 0) {
-            return res.status(400).send({
-                message: 'No puede venir sin datos'
-            });
-        }
-        const nuevoPuesto = await Puesto.create(req.body);
-        
-        res.status(200).send({
-            message: `Agregado correctamente el puesto ${req.body.nombrePuesto}`,
-            data: nuevoPuesto
+exports.createPuesto = async (req, res, next) => {
+    if (req.body.length==0) {
+        res.status(400).send({
+          message: 'No puede venir sin datos'
         });
-    } catch (error) {
-        res.status(500).send({
-            message: error.message || 'Ocurrió un error al crear el puesto.'
+        return;
+      }
+      // Crea una nueva puesto
+      Puesto.create(req.body)
+        .then(data => {
+          res.status(200).send({
+            message: `Agregada correctamente el Puesto con nombre ${req.body.nombrePuesto}`,
+            data:data
+          });   
+          req.id = data.idPuesto;  
+          next();
+        })
+        .catch(err => {
+          res.status(500).send({
+            message:
+              err.message || 'Ocurrió un error al crear el puesto.'
+          });
         });
-    }
 };
 
 exports.findAllPuestos = async (req, res) => {
@@ -89,7 +94,7 @@ exports.updatePuesto = async (req, res) => {
     });
 };
 
-exports.deletePuesto = async (req, res) => {
+exports.deletePuesto = async (req, res, next) => {
     const id = req.params.id;
 
     Puesto.findByPk(id)
