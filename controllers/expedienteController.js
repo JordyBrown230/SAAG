@@ -163,7 +163,7 @@ exports.getEmployeeExpedient = (req, res) =>{
 
 };
 
-exports.create = (req, res, next) => {
+exports.create = (req, res) => {
 
     const errorMensaje = validarCamposNoNulos(req);
     if (errorMensaje) {
@@ -181,8 +181,7 @@ exports.create = (req, res, next) => {
             status: '200',
             data: data
         });
-        req.id = data.idExpediente;  
-        next();
+       
       })
       .catch(err => {
         res.json({
