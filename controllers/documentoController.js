@@ -163,96 +163,94 @@ exports.deleteDocumento = (req, res) => {
     });
   });
 }
+const documentosVencidos = (documentos) => {
+  const hoy = new Date();
+  return documentos
+      .filter(documento => {
+          const vencimiento = new Date(documento.fechaVencimiento);
+          const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
 
+          return diasRestantes <= 0 && diasRestantes >= -90 &&
+              (diasRestantes % 7 === 0 || diasRestantes === -1 || diasRestantes === -2);
+      })
+      .map(documento => ({ nombreArchivo: documento.nombreArchivo, idColaborador: documento.idColaborador }));
+};
+
+const obtenerColaboradores = async (identificadores) => {
+  try {
+      const colaboradores = await Colaborador.findAll({
+          where: {
+              id: {
+                  [Op.in]: identificadores
+              }
+          },
+          attributes: ['correoElectronico']
+      });
+      return colaboradores.map(colaborador => colaborador.correo);
+  } catch (error) {
+      console.error('Error al obtener colaboradores:', error.message);
+      return [];
+  }
+};
+
+const enviarCorreos = async () => {
+  const documentos = await Documento.findAll();
+  const documentoVencido = documentosVencidos(documentos);
+  if (documentoVencido.length === 0) {
+      console.log('No hay documentos vencidos');
+      return;
+  }
+  const identificadores = documentosVencidos.map(doc => doc.idColaborador);
+  const correos = await obtenerColaboradores(identificadores);
+
+  const from = "Informacion relevante";
+
+  const listaCorreos = correos.map(correo => ({
+      correo,
+      mensaje: `Hola, este es un recordatorio de que el documento ${documentosVencidos.find(doc => doc.idColaborador === identificadores.find(id => id === correo)).nombreArchivo} esta por vencerse. Por favor, tómese un momento para revisarlo y actualizarlo si es necesario. Gracias.`
+  }));
+
+  for (const { correo, mensaje } of listaCorreos) {
+      await enviarCorreo([correo], 'Documento Vencido', mensaje, from);
+  }
+
+  console.log('Correos enviados correctamente');
+};
+
+const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
+  const ahora = new Date();
+  let horaDeseada = new Date(
+      ahora.getFullYear(),
+      ahora.getMonth(),
+      ahora.getDate(),
+      hora,
+      minuto,
+      0,
+      0
+  );
+
+  if (ahora > horaDeseada) {
+      // Si la hora deseada ya pasó hoy, programarla para mañana
+      horaDeseada.setDate(horaDeseada.getDate() + 1); // asignacion para el siguiente dia
+      console.log('Programar la siguiente ejecución para:', horaDeseada);
+  }
+
+  // Calcular el tiempo restante para la próxima ejecución
+  const tiempoParaEjecutar = horaDeseada - ahora;
+
+  // Programar la ejecución de la función usando setTimeout
+  setTimeout(() => {
+      funcion();
+      // Programar la siguiente ejecución para cierta hora
+      ejecutarFuncionDiaria(hora, minuto, funcion);
+  }, tiempoParaEjecutar);
+};
+
+// Función de autoejecución
 (async () => {
   try {
-    console.log("hoy documentos");
-    const documentosVencidos = (documentos) => {
-      const hoy = new Date();
-      return documentos
-          .filter(documento => {
-              const vencimiento = new Date(documento.fechaVencimiento);
-              const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
-  
-              return diasRestantes <= 0 && diasRestantes >= -90 &&
-                  (diasRestantes % 7 === 0 || diasRestantes === -1 || diasRestantes === -2);
-          })
-          .map(documento => ({ nombreArchivo: documento.nombreArchivo, idColaborador: documento.idColaborador }));
-        };
-  
-      
-        const enviarCorreos = async () => {
-          const documentos = await Documento.findAll();
-          const documentoVencido = documentosVencidos(documentos);
-          if (documentoVencido.length === 0) {
-              console.log('No hay documentos vencidos');
-              return;
-          }
-          const identificadores = documentosVencidos.map(doc => doc.idColaborador);
-          const correos = await obtenerColaboradores(identificadores);
-      
-          const from = "Informacion relevante";
-      
-          const listaCorreos = correos.map(correo => ({
-              correo,
-              mensaje: `Hola, este es un recordatorio de que el documento ${documentosVencidos.find(doc => doc.idColaborador === identificadores.find(id => id === correo)).nombreDocumento} esta por vencerse. Por favor, tómese un momento para revisarlo y actualizarlo si es necesario. Gracias.`
-          }));
-      
-          for (const { correo, mensaje } of listaCorreos) {
-              await enviarCorreo([correo], 'Documento Vencido', mensaje, from);
-          }
-      
-          console.log('Correos enviados correctamente');
-      };
-      
+      console.log("documentos");
 
-      const obtenerColaboradores = async (identificadores) => {
-        try {
-            const colaboradores = await Colaborador.findAll({
-                where: {
-                    id: {
-                        [Op.in]: identificadores
-                    }
-                },
-                attributes: ['correoElectronico']
-            });
-            return colaboradores.map(colaborador => colaborador.correo);
-        } catch (error) {
-            console.error('Error al obtener colaboradores:', error.message);
-            return [];
-        }
-    };
-    
-    const ejecutarFuncionDiaria = (hora, minuto, funcion) => {  // definicion horaria para asignar al siguiente dia
-      const ahora = new Date();
-      let horaDeseada = new Date(
-          ahora.getFullYear(),
-          ahora.getMonth(),
-          ahora.getDate(),
-          hora,
-          minuto,
-          0,
-          0
-      );
-  
-      if (ahora > horaDeseada) {
-          // Si la hora deseada ya pasó hoy, programarla para mañana
-          horaDeseada.setDate(horaDeseada.getDate() + 1);      // asignacion para el siguiente dia
-          console.log('Programar la siguiente ejecución para:', horaDeseada);
-
-      }
-  
-      // Calcular el tiempo restante para la próxima ejecución
-      const tiempoParaEjecutar = horaDeseada - ahora;
-  
-      // Programar la ejecución de la función usando setTimeout
-      setTimeout(() => {
-          funcion();
-          // Programar la siguiente ejecución para cierta hora
-          ejecutarFuncionDiaria(hora, minuto, funcion);
-      }, tiempoParaEjecutar);
-      };
-      
       // Configurar la hora y el minuto deseados para enviar el correo
       const horaDeseada = 17; // 03:00 AM la mejor hora para hacerlo
       const minutoDeseado = 12;
@@ -260,7 +258,6 @@ exports.deleteDocumento = (req, res) => {
       // Ejecutar la función una vez al día a la hora deseada
       ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreos);
 
-      //console.log(documentosVencidos(documentos));
   } catch (error) {
       console.error('Ocurrió un error:', error.message);
   }

@@ -5,7 +5,6 @@ const { authenticateToken, authorizeRoles} = require('../middlewares/auth.middle
 const {auditLogin, auditLogout} = require('../middlewares/audit.middleware');
 
 router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) => {
-  // Ruta protegida solo para usuarios con rol 'admin'
   res.json({ message: 'Acceso permitido para el rol de administrador' });
 });
 

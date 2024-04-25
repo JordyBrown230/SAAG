@@ -3,7 +3,9 @@
     const Colaborador = db.colaborador;
     const Usuario = db.usuario;
     const Puesto = db.puesto;
-  
+    const fs = require('fs');
+    const { parseString } = require('xml2js');
+
     exports.createColaborador = async (req, res, next) => {
 
             if (Object.keys(req.body).length === 0) {
@@ -213,117 +215,121 @@
         });
         }
     };
-    // Funcion IIEF la que permite verificar cada cierto tiempo cualquier cosa, espero lo de los docuemtos para agregar la funcion para verificar fechas de vencimiento
-    (async () => {
-        console.log('Se envió'); // Verificación de carga del archivo
-        try {
-            const nombresCumpleanierosHoy = (colaboradores) => {
-                const hoy = new Date();
-                return colaboradores
-                    .filter(colaborador => {
-                        // Obtener día y mes de la fecha de nacimiento
-                        const fechaNacimiento = colaborador.fechaNacimiento.split('-');
-                        const diaNacimiento = parseInt(fechaNacimiento[2], 10); // Día de nacimiento
-                        const mesNacimiento = parseInt(fechaNacimiento[1], 10) - 1; // Mes de nacimiento (restar 1 porque los meses se indexan desde 0)
-                        console.log("Día de nacimiento:", diaNacimiento);
-                        console.log("Mes de nacimiento:", mesNacimiento + 1); // Sumar 1 porque queremos mostrar el mes correctamente
-                        console.log("Día actual:", hoy.getDate(), "hoy");
-                        console.log("Mes actual:", hoy.getMonth() + 1);
-                        return diaNacimiento === hoy.getDate() && mesNacimiento === hoy.getMonth();
-                    })
-                    .map(colaborador => colaborador.nombre);
-            };           
-            
-            const enviarCorreoCumpleanieros = async () => {
-                const colaboradores = await Colaborador.findAll(); // Se obtienen todos los colaboradores
-                const nombresCumpleanieros = nombresCumpleanierosHoy(colaboradores);
-                // Verificar si hay cumpleañeros hoy
-                if (nombresCumpleanieros.length === 0) {
-                    console.log('No hay cumpleañeros hoy');
-                    return;
+    // Funciones definidas fuera de la IIFE
+    const nombresCumpleanierosHoy = (colaboradores) => {
+        const hoy = new Date();
+        return colaboradores
+            .filter(colaborador => {
+                const fechaNacimiento = colaborador.fechaNacimiento.split('-');
+                const diaNacimiento = parseInt(fechaNacimiento[2], 10); // Día de nacimiento
+                const mesNacimiento = parseInt(fechaNacimiento[1], 10) - 1; // Mes de nacimiento (restar 1 porque los meses se indexan desde 0)
+                return diaNacimiento === hoy.getDate() && mesNacimiento === hoy.getMonth();
+            })
+            .map(colaborador => colaborador.nombre);
+    };
+
+    const enviarCorreoCumpleanieros = async () => {
+        const colaboradores = await Colaborador.findAll(); // Se obtienen todos los colaboradores
+        const nombresCumpleanieros = nombresCumpleanierosHoy(colaboradores);
+        // Verificar si hay cumpleañeros hoy
+        if (nombresCumpleanieros.length === 0) {
+            console.log('No hay cumpleañeros hoy');
+            return;
+        }
+    
+        // Leer el archivo XML que contiene los mensajes
+        const xmlString = fs.readFileSync('../mensajes/mensaje_cumpleanios.xml', 'utf8');
+    
+        let mensajes = {};
+    
+        // Parsear el XML para obtener los mensajes
+        parseString(xmlString, (err, result) => {
+            if (err) {
+                console.error('Error al parsear el archivo XML:', err);
+                return;
+            }
+            mensajes = result.mensajes.mensaje.reduce((acc, mensaje) => {
+                acc[mensaje.$.tipo] = {
+                    asunto: mensaje.asunto[0],
+                    contenido: mensaje.contenido[0]
+                };
+                return acc;
+            }, {});
+        });
+    
+        // Esperar un momento para que se complete la lectura y el parseo del XML
+        setTimeout(() => {
+            const listaCorreos = colaboradores.map(colaborador => {
+                let mensaje = mensajes.cumpleanos.contenido.replace('{nombre}', colaborador.nombre);
+    
+                let asunto = mensajes.cumpleanos.asunto;
+    
+                if (!nombresCumpleanieros.includes(colaborador.nombre)) {
+                    mensaje = mensajes.otro.contenido.replace('{nombre}', colaborador.nombre);
+                    asunto = mensajes.otro.asunto.replace('{nombre}', colaborador.nombre)
+                        .replace('{cumpleanieros}', nombresCumpleanieros.map(nombre => `<li>${nombre}</li>`).join(''));
                 }
     
-                const listaCorreos = colaboradores.map(colaborador => ({  // recuperamos todos los colaboradores y buscamos que se envien los mensajes   
+                return {
                     correo: colaborador.correoElectronico,
-                    mensaje: nombresCumpleanieros.includes(colaborador.nombre)   // seleccion de mensaje a mostrar segun si esta de cumpleaños o no 
-
-                        ? `<div style="width: 600px; height: 800px; background-image: url('https://i.pinimg.com/564x/f4/af/88/f4af8848b315b9a69990e6bf51f148c1.jpg'); background-size: cover; background-repeat: no-repeat; background-position: center center; color: #001F3F; text-align: center;">
-                        <div style="margin: 0 auto; max-width: 80%;">
-                            <div style="padding-top: 170px;">
-                                <h2 style="font: oblique bold 120% cursive; color: black; font-size: 30px;">¡Feliz Cumpleaños, ${colaborador.nombre}!</h2>
-                            </div>
-                            <div style="padding: 5px; font-size: 20px;">
-                                <p>Como parte de ACIB, queremos desearte un día lleno de alegría y felicidad en tu cumpleaños.</p>
-                            </div>
-                            <div style="padding: 5px; font-size: 18px;">
-                                <p>Que el Señor te bendiga y te guarde; que el Señor haga resplandecer su rostro sobre ti y tenga de ti misericordia; que el Señor alce sobre ti su rostro y ponga en ti paz." - Números 6:24-26</p>
-                            </div>
-                            <div style="padding: 5px; font-size: 14px;">
-                                <p>¡Que todos tus deseos se hagan realidad!</p>
-                            </div>
-                        </div>
-                    </div>                                                                                                                                                                  
-                        `: `<div style="background-image: url('https://i.pinimg.com/564x/20/c0/dc/20c0dc691b73663021e7c6642abad5bc.jpg'); background-size: cover; color: #001F3F; width: 480px; height: 800px; text-align: center;">
-                        <div style="margin: 0 auto; max-width: 80%; padding-top: 145px;">
-                            <h2 style="font: oblique bold 120% cursive; font-size: 40px;">¡${colaborador.nombre}, Comparte los Festejos!</h2>
-                            <p>En ACIB, queremos que disfrutes de un día lleno de alegría y felicidad junto a tus compañeros.</p>
-                            <h2>¡Celebremos juntos!</h2>
-                            <p>Hoy es un día especial, celebramos el cumpleaños de algunos de nuestros colaboradores. ¡Te invitamos a unirte a nosotros en esta celebración!</p>
-                            <ul style="list-style-type: none; padding: 0;">
-                                ${nombresCumpleanieros.map(nombre => `<li>${nombre}</li>`).join('')}
-                            </ul>
-                        </div>
-                    </div>                    
-                        `
-                }));
-
-                const from = "Informacion relevante";
+                    asunto: asunto,
+                    mensaje: mensaje
+                };
+            });
     
-                for (const { correo, mensaje } of listaCorreos) {
-                    await enviarCorreo([correo], '¡Feliz Cumpleaños!', mensaje, from); 
-                }
+            const from = "Informacion relevante";
     
-                console.log('Correos enviados correctamente');
-            };
+            for (const { correo, asunto, mensaje } of listaCorreos) {
+                enviarCorreo([correo], asunto, mensaje, from);
+            }
     
-            const ejecutarFuncionDiaria = (hora, minuto, funcion) => { 
-                const ahora = new Date();
-                let horaDeseada = new Date(
-                    ahora.getFullYear(),
-                    ahora.getMonth(),
-                    ahora.getDate(),
-                    hora,
-                    minuto,
-                    0,
-                    0
-                );
-            
-                if (ahora > horaDeseada) {
-                    // Si la hora deseada ya pasó hoy, programarla para mañana
-                    horaDeseada.setDate(horaDeseada.getDate() + 1);      // asignacion para el siguiente dia
-                    console.log('Programar la siguiente ejecución para:', horaDeseada);
+            console.log('Correos enviados correctamente');
+        }, 100);
+    };
 
-                }
-            
-                // Calcular el tiempo restante para la próxima ejecución
-                const tiempoParaEjecutar = horaDeseada - ahora;
-            
-                // Programar la ejecución de la función usando setTimeout
-                setTimeout(() => {
-                    funcion();
-                    // Programar la siguiente ejecución para cierta hora
-                    ejecutarFuncionDiaria(hora, minuto, funcion);
-                }, tiempoParaEjecutar);
-            };
-            
+    const ejecutarFuncionDiaria = (hora, minuto, funcion) => { 
+        const ahora = new Date();
+        let horaDeseada = new Date(
+            ahora.getFullYear(),
+            ahora.getMonth(),
+            ahora.getDate(),
+            hora,
+            minuto,
+            0,
+            0
+        );
+
+        if (ahora > horaDeseada) {
+            // Si la hora deseada ya pasó hoy, programarla para mañana
+            horaDeseada.setDate(horaDeseada.getDate() + 1);      // asignacion para el siguiente dia
+            console.log('Programar la siguiente ejecución para:', horaDeseada);
+
+        }
+
+        // Calcular el tiempo restante para la próxima ejecución
+        const tiempoParaEjecutar = horaDeseada - ahora;
+
+        // Programar la ejecución de la función usando setTimeout
+        setTimeout(() => {
+            funcion();
+            // Programar la siguiente ejecución para cierta hora
+            ejecutarFuncionDiaria(hora, minuto, funcion);
+        }, tiempoParaEjecutar);
+    };
+
+    // Inicialización de la IIFE
+    (async () => {
+        console.log('Colaborador'); // Verificación de carga del archivo
+        try {
             // Configurar la hora y el minuto deseados para enviar el correo
             const horaDeseada = 3; // 03:00 AM la mejor hora para hacerlo
             const minutoDeseado = 1;
-    
+
             // Ejecutar la función una vez al día a la hora deseada
             ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreoCumpleanieros);
         } catch (error) {
             console.error('Ocurrió un error:', error.message);
         }
     })();
-    
+
+        
