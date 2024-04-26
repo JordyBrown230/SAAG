@@ -1,5 +1,3 @@
-const moment = require('moment');
-
 function getFileLength(length) {
   const tamanoArchivoBytes = length;
   const tamanoArchivoKB = tamanoArchivoBytes / 1024;
@@ -8,8 +6,7 @@ function getFileLength(length) {
 }
 
 function getDateUploaded() {
-  const fechaSubida = new Date();
-  //const fechaFormateada = moment(fechaSubida).format('YYYY-MM-DD');
+  const fechaSubida = new Date().toUTCString();
   return fechaSubida;
 }
 
