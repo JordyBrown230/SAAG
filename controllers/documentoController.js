@@ -181,18 +181,6 @@ exports.deleteDocumento = (req, res) => {
     });
   });
 }
-const documentosVencidos = (documentos) => {
-  const hoy = new Date();
-  return documentos
-      .filter(documento => {
-          const vencimiento = new Date(documento.fechaVencimiento);
-          const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
-
-          return diasRestantes <= 0 && diasRestantes >= -90 &&
-              (diasRestantes % 7 === 0 || diasRestantes === -1 || diasRestantes === -2);
-      })
-      .map(documento => ({ nombreArchivo: documento.nombreArchivo, idColaborador: documento.idColaborador }));
-};
 
 const obtenerColaboradores = async (identificadores) => {
   try {
@@ -211,29 +199,69 @@ const obtenerColaboradores = async (identificadores) => {
   }
 };
 
+const documentosVencidosYProximos = (documentos) => {
+  const hoy = new Date();
+  const documentosVencidosYProximos = documentos.filter(documento => {
+      const vencimiento = new Date(documento.fechaVencimiento);
+      const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+
+      return diasRestantes <= 0 || (diasRestantes >= 0 && diasRestantes <= 90 &&
+          (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2));
+  });
+
+  const vencidos = documentosVencidosYProximos.filter(documento => {
+      const vencimiento = new Date(documento.fechaVencimiento);
+      const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+
+      return diasRestantes <= 0;
+  });
+
+  const porVencerse = documentosVencidosYProximos.filter(documento => {
+      const vencimiento = new Date(documento.fechaVencimiento);
+      const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+
+      return diasRestantes >= 0 && diasRestantes <= 90 &&
+          (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2);
+  });
+
+  return { vencidos, porVencerse };
+};
+
 const enviarCorreos = async () => {
   const documentos = await Documento.findAll();
-  const documentoVencido = documentosVencidos(documentos);
-  if (documentoVencido.length === 0) {
-      console.log('No hay documentos vencidos');
-      return;
+  const { vencidos, porVencerse } = documentosVencidosYProximos(documentos);
+
+  if (vencidos.length > 0) {
+      console.log('Hay documentos vencidos:', vencidos);
   }
-  const identificadores = documentosVencidos.map(doc => doc.idColaborador);
-  const correos = await obtenerColaboradores(identificadores);
+
+  if (porVencerse.length > 0) {
+      console.log('Hay documentos por vencerse:', porVencerse);
+  }
+
+  const correosVencidos = vencidos.map(documento => documento.idColaborador);
+  const correosPorVencerse = porVencerse.map(documento => documento.idColaborador);
+
+  const correos = await obtenerColaboradores(correosVencidos.concat(correosPorVencerse));
 
   const from = "Informacion relevante";
 
-  const listaCorreos = correos.map(correo => ({
-      correo,
-      mensaje: `Hola, este es un recordatorio de que el documento ${documentosVencidos.find(doc => doc.idColaborador === identificadores.find(id => id === correo)).nombreArchivo} esta por vencerse. Por favor, tómese un momento para revisarlo y actualizarlo si es necesario. Gracias.`
-  }));
+  for (const correo of correos) {
+      const mensajeVencidos = vencidos.filter(documento => documento.idColaborador === correo)
+          .map(documento => `El documento ${documento.nombreArchivo} está vencido. Por favor, tómese un momento para revisarlo y actualizarlo si es necesario.`)
+          .join('\n');
 
-  for (const { correo, mensaje } of listaCorreos) {
-      await enviarCorreo([correo], 'Documento Vencido', mensaje, from);
+      const mensajePorVencerse = porVencerse.filter(documento => documento.idColaborador === correo)
+          .map(documento => `El documento ${documento.nombreArchivo} está por vencerse. Por favor, tómese un momento para revisarlo y actualizarlo si es necesario.`)
+          .join('\n');
+
+      await enviarCorreo([correo], 'Documentos', `${mensajeVencidos}\n${mensajePorVencerse}`, from);
   }
 
   console.log('Correos enviados correctamente');
 };
+
+
 
 const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
   const ahora = new Date();
