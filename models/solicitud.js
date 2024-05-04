@@ -5,7 +5,7 @@ module.exports = (sequelize, Sequelize) => {
       idSolicitud: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
       conGoceSalarial: {
         type: Sequelize.BOOLEAN,
@@ -71,7 +71,19 @@ module.exports = (sequelize, Sequelize) => {
       },
       idColaborador: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+      },
+      nombreArchivo: {
+        type: Sequelize.STRING(100),
+        allowNull: true,
+      },
+      comprobante: {
+        type: Sequelize.BLOB("long"),
+        allowNull: true,
+      },
+      tamanio: {
+        type: Sequelize.STRING(100),
+        allowNull: true,
       },
     },
     {
