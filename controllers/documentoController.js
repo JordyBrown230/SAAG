@@ -21,24 +21,7 @@ exports.getDocsEmployee = async (req, res) => {
   });
 };
 
-exports.findAll = (req, res) => {
-  Documento.findAll({
-    include: [
-      {
-        model: Colaborador,
-        as: 'colaborador',
-      },
-    ],
-  })
-  .then(data => {
-    res.send(data);
-  })
-  .catch(err => {
-    res.status(500).send({
-      message: err.message || 'Ocurrió un error al obtener los datos.'
-    });
-  });
-};
+
 
 exports.uploadPdf = async (req, res) => {  // agregar el enviar correo
     try {
