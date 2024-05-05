@@ -19,6 +19,7 @@ router.get('/documentos/obtener-foto/:idColaborador',  documentoController.getFo
 
 router.get('/documentos/obtener-fotoCarnet/:idColaborador',  documentoController.getPhotoCarnetById);
 
+router.get('/documentos/', authenticateToken, authorizeRoles(['admin']), documentoController.findAll);
 
 module.exports = router;
 
