@@ -40,7 +40,7 @@ exports.findAll = (req, res) => {
   });
 };
 
-exports.uploadPdf = async (req, res) => {  // agregar el enviar correo
+exports.uploadPdf = async (req, res) => {  
     try {
 
       const {idColaborador, licencia, curso, fechaVencimiento} = req.body;
@@ -154,9 +154,7 @@ exports.getFotoCarnet = async (req, res) => {
   }
 };
 
-
 exports.deleteDocumento = (req, res) => {
-  
   Documento.findByPk(req.params.id)
   .then((documento)=> {
     if(documento){
@@ -184,18 +182,18 @@ exports.deleteDocumento = (req, res) => {
 
 const obtenerColaboradores = async (identificadores) => {
   try {
-      const colaboradores = await Colaborador.findAll({
-          where: {
-              id: {
-                  [Op.in]: identificadores
-              }
-          },
-          attributes: ['correoElectronico']
-      });
-      return colaboradores.map(colaborador => colaborador.correo);
+    const colaboradores = await Colaborador.findAll({
+      where: {
+        id: {
+          [Op.in]: identificadores
+        }
+      },
+      attributes: ['correoElectronico']
+    });
+    return colaboradores.map(colaborador => colaborador.correoElectronico);
   } catch (error) {
-      console.error('Error al obtener colaboradores:', error.message);
-      return [];
+    console.error('Error al obtener colaboradores:', error.message);
+    return [];
   }
 };
 
@@ -204,64 +202,49 @@ const documentosVencidosYProximos = (documentos) => {
   const documentosVencidosYProximos = documentos.filter(documento => {
       const vencimiento = new Date(documento.fechaVencimiento);
       const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
-
       return diasRestantes <= 0 || (diasRestantes >= 0 && diasRestantes <= 90 &&
           (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2));
   });
-
   const vencidos = documentosVencidosYProximos.filter(documento => {
       const vencimiento = new Date(documento.fechaVencimiento);
       const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
-
       return diasRestantes <= 0;
   });
-
   const porVencerse = documentosVencidosYProximos.filter(documento => {
       const vencimiento = new Date(documento.fechaVencimiento);
       const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
-
       return diasRestantes >= 0 && diasRestantes <= 90 &&
           (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2);
   });
-
   return { vencidos, porVencerse };
 };
 
 const enviarCorreos = async () => {
   const documentos = await Documento.findAll();
   const { vencidos, porVencerse } = documentosVencidosYProximos(documentos);
-
-  if (vencidos.length > 0) {
-      console.log('Hay documentos vencidos:', vencidos);
-  }
-
-  if (porVencerse.length > 0) {
-      console.log('Hay documentos por vencerse:', porVencerse);
-  }
-
   const correosVencidos = vencidos.map(documento => documento.idColaborador);
   const correosPorVencerse = porVencerse.map(documento => documento.idColaborador);
-
-  const correos = await obtenerColaboradores(correosVencidos.concat(correosPorVencerse));
-
+  const correos = await obtenerColaboradores([...new Set(correosVencidos.concat(correosPorVencerse))]);
   const from = "Informacion relevante";
-
   for (const correo of correos) {
-      const mensajeVencidos = vencidos.filter(documento => documento.idColaborador === correo)
-          .map(documento => `El documento ${documento.nombreArchivo} está vencido. Por favor, tómese un momento para revisarlo y actualizarlo si es necesario.`)
-          .join('\n');
-
-      const mensajePorVencerse = porVencerse.filter(documento => documento.idColaborador === correo)
-          .map(documento => `El documento ${documento.nombreArchivo} está por vencerse. Por favor, tómese un momento para revisarlo y actualizarlo si es necesario.`)
-          .join('\n');
-
-      await enviarCorreo([correo], 'Documentos', `${mensajeVencidos}\n${mensajePorVencerse}`, from);
+    // Filtrar documentos para el colaborador actual
+    console.log(correo);
+    const documentosColaborador = documentos.filter(documento => documento.idColaborador === correo);
+    // Separar documentos vencidos y por vencerse
+    const documentosVencidos = documentosColaborador.filter(documento => vencidos.includes(documento));
+    const documentosPorVencerse = documentosColaborador.filter(documento => porVencerse.includes(documento));
+    // Crear mensaje para documentos vencidos del colaborador
+    const mensajeVencidos = documentosVencidos.map(documento => `El documento ${documento.nombreArchivo} está vencido.`).join('\n');
+    // Crear mensaje para documentos por vencerse del colaborador
+    const mensajePorVencerse = documentosPorVencerse.map(documento => `El documento ${documento.nombreArchivo} está por vencerse.`).join('\n');
+    // Enviar correo si hay documentos vencidos o por vencerse para el colaborador
+    if (mensajeVencidos || mensajePorVencerse) {
+      const mensaje = `${mensajeVencidos}\n${mensajePorVencerse}`;
+      await enviarCorreo([correo], 'Documentos', mensaje, from);
+    }
   }
-
   console.log('Correos enviados correctamente');
 };
-
-
 
 const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
   const ahora = new Date();
@@ -291,19 +274,15 @@ const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
       ejecutarFuncionDiaria(hora, minuto, funcion);
   }, tiempoParaEjecutar);
 };
-
 // Función de autoejecución
 (async () => {
   try {
       console.log("documentos");
-
       // Configurar la hora y el minuto deseados para enviar el correo
-      const horaDeseada = 17; // 03:00 AM la mejor hora para hacerlo
-      const minutoDeseado = 12;
-
+      const horaDeseada = 13; // 03:00 AM la mejor hora para hacerlo
+      const minutoDeseado = 50;
       // Ejecutar la función una vez al día a la hora deseada
       ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreos);
-
   } catch (error) {
       console.error('Ocurrió un error:', error.message);
   }

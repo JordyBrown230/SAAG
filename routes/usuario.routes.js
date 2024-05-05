@@ -4,6 +4,8 @@ const usuarioController = require('../controllers/usuario.controller');
 const { authenticateToken, authorizeRoles} = require('../middlewares/auth.middleware');
 const {auditLogin, auditLogout} = require('../middlewares/audit.middleware');
 
+router.use(cors()); // prueba de los cors
+
 router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) => {
   res.json({ message: 'Acceso permitido para el rol de administrador' });
 });
