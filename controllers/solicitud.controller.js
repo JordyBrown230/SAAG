@@ -20,7 +20,13 @@ exports.create = (req, res, next) => {
     });
     return;
   }
-  // Crea una nueva solicitud
+  if (req.body.horaInicio === '') {
+    req.body.horaInicio = null;
+  }
+  
+  if (req.body.horaFin === '') {
+    req.body.horaFin = null;
+  }
   Solicitud.create({
     ...req.body,
     comprobante: buffer,
@@ -127,7 +133,14 @@ exports.update = (req, res, next) => {
   const { cadenaDecodificada, buffer, length } = req.file
     ? preparacionDocumento(req)
     : { cadenaDecodificada: null, buffer: null, length: 0 };
-
+    
+    if (req.body.horaInicio === '') {
+      req.body.horaInicio = null;
+    }
+    
+    if (req.body.horaFin === '') {
+      req.body.horaFin = null;
+    }
   // Busca la solicitud en la base de datos
   Solicitud.findByPk(id)
     .then((solicitud) => {
