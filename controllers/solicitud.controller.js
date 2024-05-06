@@ -279,6 +279,12 @@ exports.getFileById = async (req, res) => {
       });
     }
 
+    if (solicitud.nombreArchivo===null) {
+      return res.status(500).send({
+        message: "El nombre del archivo no está disponible",
+      });
+    }else{
+
     // Establece el tipo de contenido según la extensión del archivo
     let contentType = "application/octet-stream"; // Por defecto, tipo binario
     const fileExtension = solicitud.nombreArchivo
@@ -299,8 +305,10 @@ exports.getFileById = async (req, res) => {
       `inline; filename="${solicitud.nombreArchivo}"`
     );
     res.send(solicitud.comprobante);
+  }
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
+  
 };
