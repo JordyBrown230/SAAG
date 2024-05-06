@@ -12,10 +12,10 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
       freezeTableName: true
   },
   dialectOptions: {
-      ssl: {
+     /* ssl: {
           require: true,
           rejectUnauthorized: false
-      }
+      }*/
   }
 });
 
