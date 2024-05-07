@@ -5,9 +5,16 @@ const { authenticateToken, authorizeRoles } = require('../middlewares/auth.middl
 const { auditLogin, auditLogout } = require('../middlewares/audit.middleware');
 const cors = require('cors');
 
-router.use(cors({
-  origin:  'http://localhost:5173'
-}));
+const corsOptions = {
+  origin: ['https://saag-sistema.onrender.com', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+
+router.options('*', cors(corsOptions));
+
+router.use(cors(corsOptions));
 
 router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) => {
   res.json({ message: 'Acceso permitido para el rol de administrador' });
