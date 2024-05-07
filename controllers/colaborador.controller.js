@@ -21,9 +21,10 @@
                     data:data
             }); 
             req.id = data.idColaborador; 
+            next();
             //datos que se vana a necesitar, basicamente definimos correos y demas
             const from = '"Se agregó como un nuevo colaborador" <dgadeaio4@gmail.com>';
-            const toList = [req.body.correoElectronico, "dsilvagadea@gmail.com"];  // el otro correo es de prueba para ver si se puede hacer con mas de uno, tienen que cambiarlo, ademas de que eso hace que se cree una lista de correos
+            const toList = [req.body.correoElectronico];  // el otro correo es de prueba para ver si se puede hacer con mas de uno, tienen que cambiarlo, ademas de que eso hace que se cree una lista de correos
             const subject = "Nuevo colaborador";// agregar los correos necesarios para notificar de los nuevos colaboradores 
             const htmlContent = `
                 <style>
@@ -63,7 +64,7 @@
                 </table>
             `;
             await enviarCorreo(toList, subject, htmlContent, from);  // forma de utilizar la funcion global
-            next();
+            
         })
             .catch(err => {
                 res.status(500).send({

@@ -85,11 +85,8 @@ exports.findOne = (req, res, next) => {
 // Actualiza un usuario por ID
 exports.update = async (req, res, next) => {
   const id = req.params.id;
-  console.log(req.body.password);
-  console.log(req.body.nombreUsuario);
-  console.log(req.body.correo);
-  console.log(req.body.rol);
-  if (!validarContrasena(req.body.password)) {
+
+  if (!validarContrasena(req.body.contrasena)) {
     res.status(400).send({
       message: "La contraseña no cumple con las reglas requeridas.",
     });
@@ -105,8 +102,9 @@ exports.update = async (req, res, next) => {
       });
       return;
     }
+    req.datos = usuario;
     // Encriptar la nueva contraseña antes de actualizarla
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await bcrypt.hash(req.body.contrasena, 10);
 
     // Actualiza el usuario con los nuevos datos del cuerpo del usuario, incluyendo la contraseña encriptada
     await usuario.update({
@@ -115,12 +113,12 @@ exports.update = async (req, res, next) => {
       rol: req.body.rol,
       idColaborador: req.body.idColaborador,
     });
+
     res.status(200).send({
       message: `Actualizado correctamente el usuario con ID ${id}`,
     });
     next();
   } catch (err) {
-    console.log(err.message + " no funko");
     res.status(500).send({
       message: `Ocurrió un error al actualizar el usuario con ID ${id}: ${err.message}`,
     });
@@ -307,7 +305,6 @@ exports.refreshToken = (req, res) => {
 };
 
 function validarContrasena(contrasena) {
-  console.log(contrasena);
   return (
     contrasena.length >= 8 &&
     /[A-Z]/.test(contrasena) && 
