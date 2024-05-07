@@ -11,7 +11,7 @@ exports.create = (req, res, next) => {
     });
     return;
   }
-  // Crea una nueva solicitud, revizar los correos ya que por el momento solo se envia la usuario qu hace la soli, falta que llegue a otro punto 
+  // Crea una nueva solicitud
   Solicitud.create(req.body)
     .then(async data => {
       res.status(200).send({
@@ -117,6 +117,8 @@ exports.findAll = (req,res, next) => { //en Express.js toman dos argumentos: req
 // Obtiene una solicitud por ID
 exports.findOne = (req, res, next) => {
   const id = req.params.id;
+
+
   Solicitud.findByPk(id)
     .then(data => {
       if (!data) {
