@@ -6,11 +6,10 @@ const { auditLogin, auditLogout } = require('../middlewares/audit.middleware');
 const cors = require('cors');
 
 const corsOptions = {
-  origin: ['https://saag-sistema.onrender.com', 'http://localhost:5173'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: ['http://localhost:5173/'],
+  methods: ['PUT'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
-
 
 router.options('*', cors(corsOptions));
 
