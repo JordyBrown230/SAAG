@@ -203,17 +203,20 @@ const documentosVencidosYProximos = (documentos) => {
   const documentosVencidosYProximos = documentos.filter(documento => {
       const vencimiento = new Date(documento.fechaVencimiento);
       const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+      console.log("se esta haciendo lo primero");
       return diasRestantes <= 0 || (diasRestantes >= 0 && diasRestantes <= 90 &&
           (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2));
   });
   const vencidos = documentosVencidosYProximos.filter(documento => {
       const vencimiento = new Date(documento.fechaVencimiento);
       const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+      console.log("se esta haciendo lo segurndo");
       return diasRestantes <= 0;
   });
   const porVencerse = documentosVencidosYProximos.filter(documento => {
       const vencimiento = new Date(documento.fechaVencimiento);
       const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+      console.log("se esta haciendo lo tercero");
       return diasRestantes >= 0 && diasRestantes <= 90 &&
           (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2);
   });
@@ -280,8 +283,8 @@ const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
   try {
       console.log("documentos");
       // Configurar la hora y el minuto deseados para enviar el correo
-      const horaDeseada = 13; // 03:00 AM la mejor hora para hacerlo
-      const minutoDeseado = 50;
+      const horaDeseada = 22; // 03:00 AM la mejor hora para hacerlo
+      const minutoDeseado = 27;
       // Ejecutar la función una vez al día a la hora deseada
       ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreos);
   } catch (error) {

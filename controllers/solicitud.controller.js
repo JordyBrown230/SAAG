@@ -4,88 +4,87 @@ const Solicitud = db.solicitud;
 const Colaborador = db.colaborador; // Import the Colaborador model if not already imported
 
 // Crea una nueva solicitud
-exports.create = (req, res, next) => { 
-  if (req.body.length==0) {
-    res.status(400).send({
-      message: 'No puede venir sin datos'
-    });
-    return;
-  }
-  // Crea una nueva solicitud, revizar los correos ya que por el momento solo se envia la usuario qu hace la soli, falta que llegue a otro punto 
-  Solicitud.create(req.body)
-    .then(async data => {
-      res.status(200).send({
-        message: `Agregada correctamente la solicitud de ${req.body.nombreColaborador}`,
-        data:data
-      });   
-      req.id = data.idSolicitud;  
-      next();
-      const from = '"Se ha enviado una nueva solicitud por parte del colaborador:"'+`${req.body.nombreColaborador}`+' <dgadeaio4@gmail.com>';
-      const toList = [getEmail(req.body.idColaborador)];  
-      const subject = "Solicitud de nuevo colabor";
-      const htmlContent = `
-          <style>
-              h2 {
-                  color: #333;
-                  border-bottom: 2px solid #333;
-                  padding-bottom: 10px;
-              }
-              table {
-                  width: 100%;
-                  border-collapse: collapse;
-                  margin-top: 10px;
-              }
-              th, td {
-                  padding: 10px;
-                  text-align: left;
-                  border-bottom: 1px solid #ddd;
-              }
-              th {
-                  background-color: #f2f2f2;
-              }
-          </style>
-          <h2>Informacion de la nueva solicitud</h2>
-          <table>
-              <tr>
-                  <th>Información</th>
-                  <th>Datos</th>
-              </tr>
-              <tr>
-                  <td>nombre del Colaborador:</td>
-                  <td>${req.body.nombreColaborador}</td>
-              </tr>
-              <tr>
-                  <td>salario :</td>
-                  <td>${req.body.conGoceSalarial}</td>
-              </tr>
-              <tr>
-                  <td>Solicitud de tipo:</td>
-                  <td>${req.body.tipoSolicitud}</td>
-              </tr>
-              <tr>
-                  <td>Encargado:</td>
-                  <td>${req.body.nombreEncargado}</td>
-              </tr>
-              <tr>
-                  <td>Tiempo:</td>
-                  <td>${req.body.horaInicio} - ${req.body.horaFin}</td>
-              </tr>
-          </table>
-      `;
-        await enviarCorreo(toList, subject, htmlContent, from);  
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || 'Ocurrió un error al crear la solicitud.'
+exports.create = async (req, res, next) => {
+  try {
+    if (req.body.length == 0) {
+      return res.status(400).send({
+        message: 'No puede venir sin datos'
       });
+    }
+    // Crea una nueva solicitud
+    const data = await Solicitud.create(req.body);
+    // Enviar correo electrónico
+    const subject = "Solicitud de nuevo colaborador";
+    // Definir destinatarios adicionales
+    const colaboradores = await Colaborador.findAll({
+      where: {
+        idColaborador: req.body.idColaborador
+      }
     });
-};
-
-// obtenemos el correo del colaborador para envio de correos
-const getEmail = async (id) => {
-  const colaborador = await Colaborador.findByPk(id);
-  return colaborador.email;
+    const emails = colaboradores.map(colaborador => colaborador.correoElectronico);
+    const toList = emails;
+    const from = '"Se agregó como una nueva solicitud" <dgadeaio4@gmail.com>';
+    const htmlContent = `
+      <style>
+        h2 {
+          color: #333;
+          border-bottom: 2px solid #333;
+          padding-bottom: 10px;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 10px;
+        }
+        th, td {
+          padding: 10px;
+          text-align: left;
+          border-bottom: 1px solid #ddd;
+        }
+        th {
+          background-color: #f2f2f2;
+        }
+      </style>
+      <h2>Informacion de la nueva solicitud</h2>
+      <table>
+        <tr>
+          <th>Información</th>
+          <th>Datos</th>
+        </tr>
+        <tr>
+          <td>Nombre del Colaborador:</td>
+          <td>${req.body.nombreColaborador}</td>
+        </tr>
+        <tr>
+          <td>Salario con goce:</td>
+          <td>${req.body.conGoceSalarial}</td>
+        </tr>
+        <tr>
+          <td>Tipo de solicitud:</td>
+          <td>${req.body.tipoSolicitud}</td>
+        </tr>
+        <tr>
+          <td>Encargado:</td>
+          <td>${req.body.nombreEncargado}</td>
+        </tr>
+        <tr>
+          <td>Tiempo:</td>
+          <td>${req.body.horaInicio} - ${req.body.horaFin}</td>
+        </tr>
+      </table>
+    `;
+    await enviarCorreo(toList, subject, htmlContent, from);
+    // Enviar respuesta al cliente una vez que todo esté completado
+    res.status(200).send({
+      message: `Agregada correctamente la solicitud de ${req.body.nombreColaborador}`,
+      data: data
+    });
+  } catch (err) {
+    console.error(err); // Registrar el error en la consola o en un sistema de registro de errores
+    res.status(500).send({
+      message: err.message || 'Ocurrió un error al crear la solicitud.'
+    });
+  }
 };
 
 
