@@ -3,6 +3,11 @@ const router = express.Router();
 const usuarioController = require('../controllers/usuario.controller');
 const { authenticateToken, authorizeRoles } = require('../middlewares/auth.middleware');
 const { auditLogin, auditLogout } = require('../middlewares/audit.middleware');
+const cors = require('cors');
+
+router.use(cors({
+  origin:  'http://localhost:5173'
+}));
 
 router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) => {
   res.json({ message: 'Acceso permitido para el rol de administrador' });
