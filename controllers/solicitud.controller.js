@@ -155,7 +155,7 @@ exports.update = (req, res, next) => {
             }); 
             next();   
             const from = '"Se ha Actualizado la Solicitud numero: "'+`${req.body.idSolicitud}`;
-            const toList = [getEmail(req.body.idColaborador)];  // preguntar que datos llegan para la actualizacion de la solicitud
+            const toList = ["dsilvagadea@gmail.com"];  // solucion temporal
             const subject = "Actualizacion de solicitud";
             const htmlContent = `
                 <style>
