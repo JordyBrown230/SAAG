@@ -198,41 +198,24 @@ const obtenerColaboradores = async (identificadores) => {
   }
 };
 
-const documentosVencidosYProximos = (documentos) => {
-  const hoy = new Date();
-  const documentosVencidosYProximos = documentos.filter(documento => {
-      const vencimiento = new Date(documento.fechaVencimiento);
-      const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
-      console.log("se esta haciendo lo primero");
-      return diasRestantes <= 0 || (diasRestantes >= 0 && diasRestantes <= 90 &&
-          (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2));
-  });
-  const vencidos = documentosVencidosYProximos.filter(documento => {
-      const vencimiento = new Date(documento.fechaVencimiento);
-      const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
-      console.log("se esta haciendo lo segurndo");
-      return diasRestantes <= 0;
-  });
-  const porVencerse = documentosVencidosYProximos.filter(documento => {
-      const vencimiento = new Date(documento.fechaVencimiento);
-      const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
-      console.log("se esta haciendo lo tercero");
-      return diasRestantes >= 0 && diasRestantes <= 90 &&
-          (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2);
-  });
-  return { vencidos, porVencerse };
-};
-
 const enviarCorreos = async () => {
   const documentos = await Documento.findAll();
-  const { vencidos, porVencerse } = documentosVencidosYProximos(documentos);
-  const correosVencidos = vencidos.map(documento => documento.idColaborador);
-  const correosPorVencerse = porVencerse.map(documento => documento.idColaborador);
-  const correos = await obtenerColaboradores([...new Set(correosVencidos.concat(correosPorVencerse))]);
+  // Filtro de documentos vencidos y por vencerse
+  const vencidos = await documentos.filterAsync(documento => {
+    const vencimiento = new Date(documento.fechaVencimiento);
+    const diasRestantes = Math.floor((vencimiento - new Date()) / (1000 * 60 * 60 * 24));
+    return diasRestantes <= 0;
+  });
+  const porVencerse = await documentos.filterAsync(documento => {
+    const vencimiento = new Date(documento.fechaVencimiento);
+    const diasRestantes = Math.floor((vencimiento - new Date()) / (1000 * 60 * 60 * 24));
+    return diasRestantes >= 0 && diasRestantes <= 90 &&
+      (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2);
+  });
+  const correos = await obtenerColaboradores([...new Set(vencidos.map(documento => documento.idColaborador).concat(porVencerse.map(documento => documento.idColaborador)))]);
   const from = "Informacion relevante";
   for (const correo of correos) {
     // Filtrar documentos para el colaborador actual
-    console.log(correo);
     const documentosColaborador = documentos.filter(documento => documento.idColaborador === correo);
     // Separar documentos vencidos y por vencerse
     const documentosVencidos = documentosColaborador.filter(documento => vencidos.includes(documento));
