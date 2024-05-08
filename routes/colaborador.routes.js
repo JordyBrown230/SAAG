@@ -5,9 +5,9 @@ const { authenticateToken, authorizeRoles } = require('../middlewares/auth.middl
 
 router.post('/agregar-colaborador/', authenticateToken, authorizeRoles(['admin']), colaboradorController.createColaborador);
 
-router.put('/actualizar-colaborador/:id', authenticateToken, authorizeRoles(['admin']), colaboradorController.updateColaborador);
+router.put('/actualizar-colaborador/:id', authenticateToken, authorizeRoles(['admin','supervisor']), colaboradorController.updateColaborador);
 
-router.get('/colaboradores/', authenticateToken, authorizeRoles(['admin']), colaboradorController.findAllColaboradores);
+router.get('/colaboradores/', authenticateToken, authorizeRoles(['admin','supervisor']), colaboradorController.findAllColaboradores);
 
 router.get('/colaboradores-with-user/', authenticateToken, authorizeRoles(['admin']), colaboradorController.findAllColaboradoresWithUser);
 

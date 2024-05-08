@@ -127,20 +127,24 @@ exports.findOne = (req, res, next) => {
 exports.update = (req, res, next) => {
   const id = req.params.id;
 
+  // Validación del documento si está presente
   const isValid = req.file ? validarDocumento(req) : true;
   if (!isValid) return; // Si la validación falla, se detiene el proceso
 
+  // Preparación del documento adjunto si está presente
   const { cadenaDecodificada, buffer, length } = req.file
     ? preparacionDocumento(req)
     : { cadenaDecodificada: null, buffer: null, length: 0 };
-    
-    if (req.body.horaInicio === '') {
-      req.body.horaInicio = null;
-    }
-    
-    if (req.body.horaFin === '') {
-      req.body.horaFin = null;
-    }
+
+  // Convertir horas vacías a null si es necesario
+  if (req.body.horaInicio === '') {
+    req.body.horaInicio = null;
+  }
+
+  if (req.body.horaFin === '') {
+    req.body.horaFin = null;
+  }
+
   // Busca la solicitud en la base de datos
   Solicitud.findByPk(id)
     .then((solicitud) => {
@@ -150,13 +154,22 @@ exports.update = (req, res, next) => {
         });
       } else {
         req.datos = { ...solicitud.get() };
+
+        // Si no hay comprobante adjunto pero ya hay uno en la solicitud, usar el existente
+        const comprobante = buffer ? buffer : solicitud.comprobante;
+        const tamanio = buffer ? length : solicitud.tamanio;
+        const nombreArchivo = buffer ? cadenaDecodificada : solicitud.nombreArchivo;
+
+        const comentario = req.body.comentario !== undefined ? req.body.comentario : solicitud.comentario;
+
         // Actualiza la solicitud con los nuevos datos del cuerpo de la solicitud
         solicitud
           .update({
             ...req.body,
-            comprobante: buffer,
-            tamanio: length,
-            nombreArchivo: cadenaDecodificada,
+            comprobante: comprobante,
+            tamanio: tamanio,
+            nombreArchivo: nombreArchivo,
+            comentario: comentario,
           })
           .then(() => {
             res.status(200).send({
@@ -178,6 +191,7 @@ exports.update = (req, res, next) => {
       });
     });
 };
+
 
 exports.delete = (req, res, next) => {
   const id = req.params.id;
