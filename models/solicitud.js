@@ -73,6 +73,18 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: false
       },
+      nombreArchivo: {
+        type: Sequelize.STRING(100),
+        allowNull: true,
+      },
+      comprobante: {
+        type: Sequelize.BLOB("long"),
+        allowNull: true,
+      },
+      tamanio: {
+        type: Sequelize.STRING(100),
+        allowNull: true,
+      },
     },
     {
       tableName: "Solicitud",
