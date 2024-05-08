@@ -11,18 +11,22 @@ exports.create = async (req, res, next) => {
         message: 'No puede venir sin datos'
       });
     }
+
     // Crea una nueva solicitud
     const data = await Solicitud.create(req.body);
+
     // Enviar correo electrónico
     const subject = "Solicitud de nuevo colaborador";
-    // Definir destinatarios adicionales
-    const colaboradores = await Colaborador.findAll({
-      where: {
-        idColaborador: req.body.idColaborador
-      }
-    });
-    const emails = colaboradores.map(colaborador => colaborador.correoElectronico);
-    const toList = emails;
+
+    // Obtener información del colaborador
+    const colaborador = await Colaborador.findByPk(req.body.idColaborador);
+
+    // Obtener información del supervisor
+    const supervisor = await Colaborador.findByPk(colaborador.idColaborador_fk);
+
+    // Definir destinatarios
+    const toList = [colaborador.correoElectronico, supervisor.correoElectronico];
+
     const from = '"Se agregó como una nueva solicitud" <dgadeaio4@gmail.com>';
     const htmlContent = `
       <style>
@@ -86,8 +90,6 @@ exports.create = async (req, res, next) => {
     });
   }
 };
-
-
 
 exports.findAll = (req,res, next) => { //en Express.js toman dos argumentos: req (la solicitud) y res (la respuesta).
   Solicitud.findAll({
@@ -155,7 +157,8 @@ exports.update = (req, res, next) => {
             }); 
             next();   
             const from = '"Se ha Actualizado la Solicitud numero: "'+`${req.body.idSolicitud}`;
-            const toList = ["dsilvagadea@gmail.com"];  // solucion temporal
+            console.log(req.body.idColaborador);
+            const toList = [req.body.nombreColaborador];
             const subject = "Actualizacion de solicitud";
             const htmlContent = `
                 <style>
@@ -202,7 +205,7 @@ exports.update = (req, res, next) => {
                     </tr>
                     <tr>
                         <td>Tiempo:</td>
-                        <td>${req.body.horaInicio} - ${req.body.horaFin}</td>
+                        <td>${req.body.fechaInicio} - ${req.body.fechaFin}</td>
                     </tr>
                 </table>
             `;

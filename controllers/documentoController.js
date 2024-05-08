@@ -3,6 +3,7 @@ const db = require('../models');
 const Colaborador = db.colaborador;
 const Documento = db.documento;
 const { getFileLength, getDateUploaded } = require('../mjs/functions');
+const { Op } = require('sequelize');
 
 exports.getDocsEmployee = async (req, res) => {
   const idColaborador = req.params.idColaborador;
@@ -185,7 +186,7 @@ const obtenerColaboradores = async (identificadores) => {
   try {
     const colaboradores = await Colaborador.findAll({
       where: {
-        id: {
+        idColaborador: {
           [Op.in]: identificadores
         }
       },
@@ -200,21 +201,39 @@ const obtenerColaboradores = async (identificadores) => {
 
 const enviarCorreos = async () => {
   const documentos = await Documento.findAll();
+
+  // Verificar si no hay documentos
+  if (documentos.length === 0) {
+    console.log('No hay documentos para enviar correos.');
+    return;
+  }
+
   // Filtro de documentos vencidos y por vencerse
-  const vencidos = await documentos.filterAsync(documento => {
+  const vencidos = documentos.filter(documento => {
     const vencimiento = new Date(documento.fechaVencimiento);
     const diasRestantes = Math.floor((vencimiento - new Date()) / (1000 * 60 * 60 * 24));
     return diasRestantes <= 0;
   });
-  const porVencerse = await documentos.filterAsync(documento => {
+  const porVencerse = documentos.filter(documento => {
     const vencimiento = new Date(documento.fechaVencimiento);
     const diasRestantes = Math.floor((vencimiento - new Date()) / (1000 * 60 * 60 * 24));
     return diasRestantes >= 0 && diasRestantes <= 90 &&
       (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2);
   });
+
+  // Obtener correos de colaboradores
   const correos = await obtenerColaboradores([...new Set(vencidos.map(documento => documento.idColaborador).concat(porVencerse.map(documento => documento.idColaborador)))]);
+  
+  // Verificar si hay correos para enviar
+  if (correos.length === 0) {
+    console.log('No hay correos para enviar.');
+    return;
+  }
+
   const from = "Informacion relevante";
+  console.log("correo");
   for (const correo of correos) {
+    console.log("correo"+ correo);
     // Filtrar documentos para el colaborador actual
     const documentosColaborador = documentos.filter(documento => documento.idColaborador === correo);
     // Separar documentos vencidos y por vencerse
@@ -227,11 +246,13 @@ const enviarCorreos = async () => {
     // Enviar correo si hay documentos vencidos o por vencerse para el colaborador
     if (mensajeVencidos || mensajePorVencerse) {
       const mensaje = `${mensajeVencidos}\n${mensajePorVencerse}`;
+      console.log("correos de documentos");
       await enviarCorreo([correo], 'Documentos', mensaje, from);
     }
   }
   console.log('Correos enviados correctamente');
 };
+
 
 const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
   const ahora = new Date();
@@ -266,8 +287,8 @@ const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
   try {
       console.log("documentos");
       // Configurar la hora y el minuto deseados para enviar el correo
-      const horaDeseada = 22; // 03:00 AM la mejor hora para hacerlo
-      const minutoDeseado = 27;
+      const horaDeseada = 21; // 03:00 AM la mejor hora para hacerlo
+      const minutoDeseado = 52;
       // Ejecutar la función una vez al día a la hora deseada
       ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreos);
   } catch (error) {
