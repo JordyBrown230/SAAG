@@ -21,6 +21,14 @@ exports.create = async (req, res, next) => {
       ? preparacionDocumento(req)
       : { cadenaDecodificada: null, buffer: null, length: 0 };
 
+    if(req.body.horaInicio === ''){
+      req.body.horaInicio = null;
+    }
+    
+    if(req.body.horaFin === ''){
+      req.body.horaFin = null;
+    }
+
     // Crea una nueva solicitud
     const data = await Solicitud.create({
       ...req.body,
