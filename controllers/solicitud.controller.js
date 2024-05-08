@@ -96,6 +96,7 @@ exports.create = async (req, res, next) => {
       message: `Agregada correctamente la solicitud de ${req.body.nombreColaborador}`,
       data: data,
     });
+    next();
   } catch (err) {
     console.error(err); // Registrar el error en la consola o en un sistema de registro de errores
     res.status(500).send({
