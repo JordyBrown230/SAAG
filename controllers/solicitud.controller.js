@@ -85,8 +85,8 @@ exports.create = async (req, res, next) => {
           <td>${req.body.nombreEncargado}</td>
         </tr>
         <tr>
-          <td>Tiempo:</td>
-          <td>${req.body.horaInicio} - ${req.body.horaFin}</td>
+          <td>Tiempo a solicitar:</td>
+          <td>${req.body.fechaInicio} - ${req.body.fechaFin}</td>
         </tr>
       </table>
     `;
