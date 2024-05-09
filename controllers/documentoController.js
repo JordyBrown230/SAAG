@@ -202,21 +202,28 @@ const obtenerColaboradores = async (identificadores) => {
 const enviarCorreos = async () => {
   const documentos = await Documento.findAll();
 
+  let enviarCorreo = false;
+  let mensaje = '';
+
   // Verificar si no hay documentos
   if (documentos.length === 0) {
     console.log('No hay documentos para enviar correos.');
   } else {
+    const vencidos = [];
+    const porVencerse = [];
+
     // Filtro de documentos vencidos y por vencerse
-    const vencidos = documentos.filter(documento => {
+    documentos.forEach(documento => {
       const vencimiento = new Date(documento.fechaVencimiento);
       const diasRestantes = Math.floor((vencimiento - new Date()) / (1000 * 60 * 60 * 24));
-      return diasRestantes <= 0;
-    });
-    const porVencerse = documentos.filter(documento => {
-      const vencimiento = new Date(documento.fechaVencimiento);
-      const diasRestantes = Math.floor((vencimiento - new Date()) / (1000 * 60 * 60 * 24));
-      return diasRestantes >= 0 && diasRestantes <= 90 &&
-        (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2);
+
+      if (diasRestantes <= 0) {
+        vencidos.push(documento);
+      } else if (diasRestantes >= 0 && diasRestantes <= 90) {
+        if (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2) {
+          porVencerse.push(documento);
+        }
+      }
     });
 
     // Obtener correos de colaboradores
@@ -242,15 +249,20 @@ const enviarCorreos = async () => {
         console.log(`Documentos vencidos para ${correo}:`, documentosVencidos);
         console.log(`Documentos por vencerse para ${correo}:`, documentosPorVencerse);
         if (mensajeVencidos || mensajePorVencerse) {
-          const mensaje = `${mensajeVencidos}\n${mensajePorVencerse}`;
+          mensaje += `${mensajeVencidos}\n${mensajePorVencerse}\n`;
           console.log("correos de documentos");
-          await enviarCorreo([correo], 'Documentos', mensaje, from);
+          enviarCorreo = true;
         }
       }
-      console.log('Correos enviados correctamente');
     }
   }
+
+  if (enviarCorreo) {
+    await enviarCorreo(correos, 'Documentos', mensaje, from);
+    console.log('Correos enviados correctamente');
+  }
 };
+
 
 
 
