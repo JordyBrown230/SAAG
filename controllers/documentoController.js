@@ -205,54 +205,53 @@ const enviarCorreos = async () => {
   // Verificar si no hay documentos
   if (documentos.length === 0) {
     console.log('No hay documentos para enviar correos.');
-    return;
-  }
+  } else {
+    // Filtro de documentos vencidos y por vencerse
+    const vencidos = documentos.filter(documento => {
+      const vencimiento = new Date(documento.fechaVencimiento);
+      const diasRestantes = Math.floor((vencimiento - new Date()) / (1000 * 60 * 60 * 24));
+      return diasRestantes <= 0;
+    });
+    const porVencerse = documentos.filter(documento => {
+      const vencimiento = new Date(documento.fechaVencimiento);
+      const diasRestantes = Math.floor((vencimiento - new Date()) / (1000 * 60 * 60 * 24));
+      return diasRestantes >= 0 && diasRestantes <= 90 &&
+        (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2);
+    });
 
-  // Filtro de documentos vencidos y por vencerse
-  const vencidos = documentos.filter(documento => {
-    const vencimiento = new Date(documento.fechaVencimiento);
-    const diasRestantes = Math.floor((vencimiento - new Date()) / (1000 * 60 * 60 * 24));
-    return diasRestantes <= 0;
-  });
-  const porVencerse = documentos.filter(documento => {
-    const vencimiento = new Date(documento.fechaVencimiento);
-    const diasRestantes = Math.floor((vencimiento - new Date()) / (1000 * 60 * 60 * 24));
-    return diasRestantes >= 0 && diasRestantes <= 90 &&
-      (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2);
-  });
-
-  // Obtener correos de colaboradores
-  const correos = await obtenerColaboradores([...new Set(vencidos.map(documento => documento.idColaborador).concat(porVencerse.map(documento => documento.idColaborador)))]);
-  
-  // Verificar si hay correos para enviar
-  if (correos.length === 0) {
-    console.log('No hay correos para enviar.');
-    return;
-  }
-
-  const from = "Informacion relevante";
-  console.log("correo");
-  for (const correo of correos) {
-    // Filtrar documentos para el colaborador actual
-    const documentosColaborador = documentos.filter(documento => documento.idColaborador === correo);
-    // Separar documentos vencidos y por vencerse
-    const documentosVencidos = documentosColaborador.filter(documento => vencidos.includes(documento));
-    const documentosPorVencerse = documentosColaborador.filter(documento => porVencerse.includes(documento));
-    // Crear mensaje para documentos vencidos del colaborador
-    const mensajeVencidos = documentosVencidos.map(documento => `El documento ${documento.nombreArchivo} está vencido.`).join('\n');
-    // Crear mensaje para documentos por vencerse del colaborador
-    const mensajePorVencerse = documentosPorVencerse.map(documento => `El documento ${documento.nombreArchivo} está por vencerse.`).join('\n');
-    // Enviar correo si hay documentos vencidos o por vencerse para el colaborador
-    console.log(`Documentos vencidos para ${correo}:`, documentosVencidos);
-    console.log(`Documentos por vencerse para ${correo}:`, documentosPorVencerse);
-    if (mensajeVencidos || mensajePorVencerse) {
-      const mensaje = `${mensajeVencidos}\n${mensajePorVencerse}`;
-      console.log("correos de documentos");
-      await enviarCorreo([correo], 'Documentos', mensaje, from);
+    // Obtener correos de colaboradores
+    const correos = await obtenerColaboradores([...new Set(vencidos.map(documento => documento.idColaborador).concat(porVencerse.map(documento => documento.idColaborador)))]);
+    
+    // Verificar si hay correos para enviar
+    if (correos.length === 0) {
+      console.log('No hay correos para enviar.');
+    } else {
+      const from = "Informacion relevante";
+      console.log("correo");
+      for (const correo of correos) {
+        // Filtrar documentos para el colaborador actual
+        const documentosColaborador = documentos.filter(documento => documento.idColaborador === correo);
+        // Separar documentos vencidos y por vencerse
+        const documentosVencidos = documentosColaborador.filter(documento => vencidos.includes(documento));
+        const documentosPorVencerse = documentosColaborador.filter(documento => porVencerse.includes(documento));
+        // Crear mensaje para documentos vencidos del colaborador
+        const mensajeVencidos = documentosVencidos.map(documento => `El documento ${documento.nombreArchivo} está vencido.`).join('\n');
+        // Crear mensaje para documentos por vencerse del colaborador
+        const mensajePorVencerse = documentosPorVencerse.map(documento => `El documento ${documento.nombreArchivo} está por vencerse.`).join('\n');
+        // Enviar correo si hay documentos vencidos o por vencerse para el colaborador
+        console.log(`Documentos vencidos para ${correo}:`, documentosVencidos);
+        console.log(`Documentos por vencerse para ${correo}:`, documentosPorVencerse);
+        if (mensajeVencidos || mensajePorVencerse) {
+          const mensaje = `${mensajeVencidos}\n${mensajePorVencerse}`;
+          console.log("correos de documentos");
+          await enviarCorreo([correo], 'Documentos', mensaje, from);
+        }
+      }
+      console.log('Correos enviados correctamente');
     }
   }
-  console.log('Correos enviados correctamente');
 };
+
 
 
 const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
