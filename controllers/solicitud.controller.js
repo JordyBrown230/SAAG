@@ -74,7 +74,7 @@ exports.create = async (req, res, next) => {
         </tr>
         <tr>
           <td>Salario con goce:</td>
-          <td>${req.body.conGoceSalarial}</td>
+          <td>${req.body.conGoceSalarial === 1 ? 'Sí' : 'No'}</td>
         </tr>
         <tr>
           <td>Tipo de solicitud:</td>
