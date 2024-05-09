@@ -182,23 +182,6 @@ exports.deleteDocumento = (req, res) => {
   });
 }
 
-const obtenerColaboradores = async (identificadores) => {
-  try {
-    const colaboradores = await Colaborador.findAll({
-      where: {
-        idColaborador: {
-          [Op.in]: identificadores
-        }
-      },
-      attributes: ['correoElectronico']
-    });
-    return colaboradores.map(colaborador => colaborador.correoElectronico);
-  } catch (error) {
-    console.error('Error al obtener colaboradores:', error.message);
-    return [];
-  }
-};
-
 const enviarCorreos = async () => {
   const documentos = await Documento.findAll();
 
@@ -215,16 +198,20 @@ const enviarCorreos = async () => {
     // Filtro de documentos vencidos y por vencerse
     documentos.forEach(documento => {
       const vencimiento = new Date(documento.fechaVencimiento);
-      const diasRestantes = Math.floor((vencimiento - new Date()) / (1000 * 60 * 60 * 24));
+      const hoy = new Date();
+      const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+      
+      console.log(`Documento: ${documento.nombreArchivo}, Fecha de vencimiento: ${vencimiento.toISOString()}, Días restantes: ${diasRestantes}`);
 
       if (diasRestantes <= 0) {
         vencidos.push(documento);
-      } else if (diasRestantes >= 0 && diasRestantes <= 90) {
-        if (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2) {
-          porVencerse.push(documento);
-        }
+      } else if (diasRestantes <= 90 && (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2)) {
+        porVencerse.push(documento);
       }
     });
+
+    console.log('Documentos vencidos:', vencidos);
+    console.log('Documentos por vencerse:', porVencerse);
 
     // Obtener correos de colaboradores
     const correos = await obtenerColaboradores([...new Set(vencidos.map(documento => documento.idColaborador).concat(porVencerse.map(documento => documento.idColaborador)))]);
@@ -252,16 +239,18 @@ const enviarCorreos = async () => {
           mensaje += `${mensajeVencidos}\n${mensajePorVencerse}\n`;
           console.log("correos de documentos");
           enviarCorreo = true;
+          await enviarCorreo([correo], 'Documentos', mensaje, from); // Envío de correo dentro del bucle
         }
       }
     }
   }
 
   if (enviarCorreo) {
-    await enviarCorreo(correos, 'Documentos', mensaje, from);
     console.log('Correos enviados correctamente');
   }
 };
+
+
 
 
 
