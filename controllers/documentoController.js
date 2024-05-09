@@ -182,6 +182,22 @@ exports.deleteDocumento = (req, res) => {
   });
 }
 
+const obtenerColaboradores = async (identificadores) => {
+  try {
+    const colaboradores = await Colaborador.findAll({
+      where: {
+        idColaborador: {
+          [Op.in]: identificadores
+        }
+      },
+      attributes: ['correoElectronico']
+    });
+    return colaboradores.map(colaborador => colaborador.correoElectronico);
+  } catch (error) {
+    console.error('Error al obtener colaboradores:', error.message);
+    return [];
+  }
+};
 const enviarCorreos = async () => {
   const documentos = await Documento.findAll();
 
@@ -249,10 +265,6 @@ const enviarCorreos = async () => {
     console.log('Correos enviados correctamente');
   }
 };
-
-
-
-
 
 
 const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
