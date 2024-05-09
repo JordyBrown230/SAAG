@@ -242,6 +242,7 @@ exports.update = (req, res, next) => {
         const tamanio = buffer ? length : solicitud.tamanio;
         const nombreArchivo = buffer ? cadenaDecodificada : solicitud.nombreArchivo;
         const comentario = req.body.comentario !== undefined ? req.body.comentario : solicitud.comentario;
+        const estado = req.body.estado !== undefined ? req.body.comentario : solicitud.estado;
 
         solicitud
           .update({
@@ -250,6 +251,7 @@ exports.update = (req, res, next) => {
             tamanio: tamanio,
             nombreArchivo: nombreArchivo,
             comentario: comentario,
+            estado:estado
           })
           .then(async () => {
             res.status(200).send({
