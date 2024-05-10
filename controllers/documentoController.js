@@ -206,7 +206,7 @@ const obtenerColaboradores = async (identificadores) => {
 const enviarCorreos = async () => {
   const documentos = await Documento.findAll();
   let mensaje = '';
-
+  const hoy = new Date();
   // Verificar si no hay documentos
   if (documentos.length === 0) {
     console.log('No hay documentos para enviar correos.');
@@ -216,11 +216,9 @@ const enviarCorreos = async () => {
     // Filtro de documentos vencidos y por vencerse
     documentos.forEach(documento => {
       const vencimiento = new Date(documento.fechaVencimiento);
-      const hoy = new Date();
       const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
-      
+      console.log(vencimiento + " " + hoy + " dias restantes = "+ diasRestantes);
       console.log(`Documento: ${documento.nombreArchivo}, Fecha de vencimiento: ${vencimiento.toISOString()}, Días restantes: ${diasRestantes}`); // ya lo muestra
-      
       if (diasRestantes <= 0) {
         vencidos.push(documento);
       } else if (diasRestantes <= 90 && (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2)) {
@@ -257,15 +255,26 @@ const enviarCorreos = async () => {
         const documentosVencidos = documentosColaborador.filter(documento => vencidos.includes(documento));
         const documentosPorVencerse = documentosColaborador.filter(documento => porVencerse.includes(documento));
         // Crear mensaje para documentos vencidos y por vencerse del colaborador
-        const mensajeVencidos = documentosVencidos.map(documento => `El documento ${documento.nombreArchivo} está vencido.\n`).join('\n');
-        const mensajePorVencerse = documentosPorVencerse.map(documento => `El documento ${documento.nombreArchivo} está por vencerse.\n`).join('\n');
+        const mensajeVencidos = documentosVencidos.map(documento => `<tr><td>El documento ${documento.nombreArchivo}  </td><td>está vencido  </td><td>diferencia de ${Math.floor(((new Date(documento.fechaVencimiento) - hoy.getTime())) / (1000 * 60 * 60 * 24))} dia(s)</td></tr>`).join('\n');
+        const mensajePorVencerse = documentosPorVencerse.map(documento => `<tr><td>El documento ${documento.nombreArchivo}</td> <td>está por vencerse</td><td>diferencia de ${Math.floor(((new Date(documento.fechaVencimiento) - hoy.getTime())) / (1000 * 60 * 60 * 24))} dia(s)</td></tr>`).join('\n');
         // Enviar correo si hay documentos vencidos o por vencerse para el colaborador
         console.log(`Documentos vencidos para ${correoElectronico}:`, mensajeVencidos);
         console.log(`Documentos por vencerse para ${correoElectronico}:`, mensajePorVencerse);
+        console.log(hoy);
         if (mensajeVencidos || mensajePorVencerse) {
-          mensaje += `${mensajeVencidos}\n${mensajePorVencerse}\n`;
+          mensaje += `<h2>Documentos vencidos y por vencerse</h2>
+          <table>
+            <tr>
+              <th>Documento</th>
+              <th>Estado</th>
+              <th>Tiempo Restante</th>
+            </tr>
+            ${mensajeVencidos}
+            ${mensajePorVencerse}
+          </table>`;
           console.log("correos de documentos");
           await enviarCorreo([correoElectronico], 'Documentos', mensaje, from); // Envío de correo dentro del bucle
+          mensaje = ``;
         }
       }
     }
@@ -275,8 +284,6 @@ const enviarCorreos = async () => {
     console.log('Correos enviados correctamente');
   }
 };
-
-
 
 const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
   const ahora = new Date();
@@ -311,8 +318,8 @@ const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
   try {
       console.log("documentos");
       // Configurar la hora y el minuto deseados para enviar el correo
-      const horaDeseada = 21; // 03:00 AM la mejor hora para hacerlo
-      const minutoDeseado = 4;
+      const horaDeseada = 10; // 03:00 AM la mejor hora para hacerlo
+      const minutoDeseado = 29;
       // Ejecutar la función una vez al día a la hora deseada
       ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreos);
   } catch (error) {
