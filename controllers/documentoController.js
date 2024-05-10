@@ -257,8 +257,8 @@ const enviarCorreos = async () => {
         const documentosVencidos = documentosColaborador.filter(documento => vencidos.includes(documento));
         const documentosPorVencerse = documentosColaborador.filter(documento => porVencerse.includes(documento));
         // Crear mensaje para documentos vencidos y por vencerse del colaborador
-        const mensajeVencidos = documentosVencidos.map(documento => `El documento ${documento.nombreArchivo} está vencido.`).join('\n');
-        const mensajePorVencerse = documentosPorVencerse.map(documento => `El documento ${documento.nombreArchivo} está por vencerse.`).join('\n');
+        const mensajeVencidos = documentosVencidos.map(documento => `El documento ${documento.nombreArchivo} está vencido.\n`).join('\n');
+        const mensajePorVencerse = documentosPorVencerse.map(documento => `El documento ${documento.nombreArchivo} está por vencerse.\n`).join('\n');
         // Enviar correo si hay documentos vencidos o por vencerse para el colaborador
         console.log(`Documentos vencidos para ${correoElectronico}:`, mensajeVencidos);
         console.log(`Documentos por vencerse para ${correoElectronico}:`, mensajePorVencerse);

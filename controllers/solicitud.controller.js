@@ -8,92 +8,70 @@ const { getFileLength } = require("../mjs/functions");
 // Crea una nueva solicitud
 exports.create = async (req, res, next) => {
   try {
-    if (req.body.length == 0) {
+    // Verificar si se enviaron datos
+    if (Object.keys(req.body).length === 0) {
       return res.status(400).send({
         message: "No puede venir sin datos",
       });
     }
 
+    // Validar documento si se adjuntó uno
     const isValid = req.file ? validarDocumento(req) : true;
-    if (!isValid) return; // Si la validación falla, se detiene el proceso
+    if (!isValid) {
+      return res.status(400).send({
+        message: "Documento inválido",
+      });
+    }
 
+    // Preparar documento
     const { cadenaDecodificada, buffer, length } = req.file
       ? preparacionDocumento(req)
       : { cadenaDecodificada: null, buffer: null, length: 0 };
 
-    // Crea una nueva solicitud
+    // Obtener datos del colaborador y su supervisor
+    const colaborador = await Colaborador.findByPk(req.body.idColaborador, {
+      include: [{
+        model: Colaborador,
+        as: 'supervisor',
+        attributes: ['correoElectronico'],
+      }],
+    });
+
+    // Enviar correo electrónico a colaborador y supervisor
+    const colaboradorEmail = colaborador.correoElectronico;
+    const supervisorEmail = colaborador.supervisor ? colaborador.supervisor.correoElectronico : null;
+    const toList = [colaboradorEmail, supervisorEmail].filter(Boolean);
+    const subject = "Solicitud de nuevo colaborador";
+    const from = '"Se agregó como una nueva solicitud" <dgadeaio4@gmail.com>';
+    const htmlContent = `
+      <style>
+        h2 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+      </style>
+      <h2>Informacion de la nueva solicitud</h2>
+      <table>
+        <tr><th>Información</th><th>Datos</th></tr>
+        <tr><td>Nombre del Colaborador:</td><td>${req.body.nombreColaborador}</td></tr>
+        <tr><td>Salario con goce:</td><td>${req.body.conGoceSalarial === 1 ? 'Sí' : 'No'}</td></tr>
+        <tr><td>Tipo de solicitud:</td><td>${req.body.tipoSolicitud}</td></tr>
+        <tr><td>Encargado:</td><td>${req.body.nombreEncargado}</td></tr>
+        <tr><td>Tiempo a solicitar:</td><td>${req.body.fechaInicio} - ${req.body.fechaFin}</td></tr>
+      </table>
+    `;
+    // Crear nueva solicitud
     const data = await Solicitud.create({
       ...req.body,
       comprobante: buffer,
       tamanio: length,
       nombreArchivo: cadenaDecodificada,
     });
-    // Enviar correo electrónico
-    const subject = "Solicitud de nuevo colaborador";
-    // Definir destinatarios adicionales
-    const colaboradores = await Colaborador.findAll({
-      where: {
-        idColaborador: req.body.idColaborador,
-      },
-    });
-    const emails = colaboradores.map(
-      (colaborador) => colaborador.correoElectronico
-    );
-    const toList = emails;
-    const from = '"Se agregó como una nueva solicitud" <dgadeaio4@gmail.com>';
-    const htmlContent = `
-      <style>
-        h2 {
-          color: #333;
-          border-bottom: 2px solid #333;
-          padding-bottom: 10px;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 10px;
-        }
-        th, td {
-          padding: 10px;
-          text-align: left;
-          border-bottom: 1px solid #ddd;
-        }
-        th {
-          background-color: #f2f2f2;
-        }
-      </style>
-      <h2>Informacion de la nueva solicitud</h2>
-      <table>
-        <tr>
-          <th>Información</th>
-          <th>Datos</th>
-        </tr>
-        <tr>
-          <td>Nombre del Colaborador:</td>
-          <td>${req.body.nombreColaborador}</td>
-        </tr>
-        <tr>
-          <td>Salario con goce:</td>
-          <td>${req.body.conGoceSalarial === 1 ? 'Sí' : 'No'}</td>
-        </tr>
-        <tr>
-          <td>Tipo de solicitud:</td>
-          <td>${req.body.tipoSolicitud}</td>
-        </tr>
-        <tr>
-          <td>Encargado:</td>
-          <td>${req.body.nombreEncargado}</td>
-        </tr>
-        <tr>
-          <td>Tiempo a solicitar:</td>
-          <td>${req.body.fechaInicio} - ${req.body.fechaFin}</td>
-        </tr>
-      </table>
-    `;
+    // enviamos el correo despues de registrar la solicitud
     await enviarCorreo(toList, subject, htmlContent, from);
-    // Enviar respuesta al cliente una vez que todo esté completado
+    // Enviar respuesta al cliente
     res.status(200).send({
-      message: `Agregada correctamente la solicitud de ${req.body.nombreColaborador}`,
+      message: `Solicitud creada correctamente para ${req.body.nombreColaborador}`,
       data: data,
     });
     next();
@@ -103,34 +81,6 @@ exports.create = async (req, res, next) => {
       message: err.message || "Ocurrió un error al crear la solicitud.",
     });
   }
-};
-
-exports.findAllBySupervisor = (req, res, next) => {
-  const idSupervisor = req.params.id; // Supongamos que recibes el ID del supervisor desde el front-end
-
-  Solicitud.findAll({
-    include: [
-      {
-        model: Colaborador,
-        as: "colaborador",
-        attributes: {
-          exclude: ["fotoCarnet"],
-        },
-        where: {
-          idColaborador_fk: idSupervisor,
-        },
-      },
-    ],
-  })
-    .then((data) => {
-      console.log(data);
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Ocurrió un error al obtener las solicitudes.",
-      });
-    });
 };
 
 exports.findAll = (req, res, next) => {
