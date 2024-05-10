@@ -23,7 +23,7 @@ module.exports = (sequelize,Sequelize) => {
             type: Sequelize.BLOB('long'),
             allowNull: false
         },
-        tamaño: {
+        tamano: {
             type: Sequelize.STRING(50),
             allowNull: true,
         },
