@@ -39,7 +39,9 @@ exports.create = async (req, res, next) => {
 
     // Enviar correo electrónico a colaborador y supervisor
     const colaboradorEmail = colaborador.correoElectronico;
+    console.log(colaborador.supervisor);
     const supervisorEmail = colaborador.supervisor ? colaborador.supervisor.correoElectronico : null;
+    console.log(supervisorEmail);
     const toList = [colaboradorEmail, supervisorEmail].filter(Boolean);
     const subject = "Solicitud de nuevo colaborador";
     const from = '"Se agregó como una nueva solicitud" <dgadeaio4@gmail.com>';
