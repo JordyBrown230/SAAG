@@ -191,11 +191,14 @@ const obtenerColaboradores = async (identificadores) => {
           [Op.in]: identificadores
         }
       },
-      attributes: ['idColaborador', 'correoElectronico'] // Seleccionar también el ID del colaborador
+      attributes: ['idColaborador', 'correoElectronico', 'nombre', 'estado'] // Seleccionar también el ID del colaborador
     });
     return colaboradores.map(colaborador => ({
       idColaborador: colaborador.idColaborador,
-      correoElectronico: colaborador.correoElectronico
+      correoElectronico: colaborador.correoElectronico,
+      nombre: colaborador.nombre,
+      estado:colaborador.estado
+      
     }));
   } catch (error) {
     console.error('Error al obtener colaboradores:', error.message);
@@ -247,34 +250,39 @@ const enviarCorreos = async () => {
       });
 
       for (const colaborador of colaboradores) {
-        const { idColaborador, correoElectronico } = colaborador;
-        // Obtener documentos del colaborador actual
-        const documentosColaborador = documentosPorColaborador[idColaborador] || [];
-        console.log("supuestamente correos: "+ documentosColaborador);
-        // Separar documentos vencidos y por vencerse
-        const documentosVencidos = documentosColaborador.filter(documento => vencidos.includes(documento));
-        const documentosPorVencerse = documentosColaborador.filter(documento => porVencerse.includes(documento));
-        // Crear mensaje para documentos vencidos y por vencerse del colaborador
-        const mensajeVencidos = documentosVencidos.map(documento => `<tr><td>El documento ${documento.nombreArchivo}  </td><td>está vencido  </td><td>diferencia de ${Math.floor(((new Date(documento.fechaVencimiento) - hoy.getTime())) / (1000 * 60 * 60 * 24))} dia(s)</td></tr>`).join('\n');
-        const mensajePorVencerse = documentosPorVencerse.map(documento => `<tr><td>El documento ${documento.nombreArchivo}</td> <td>está por vencerse</td><td>diferencia de ${Math.floor(((new Date(documento.fechaVencimiento) - hoy.getTime())) / (1000 * 60 * 60 * 24))} dia(s)</td></tr>`).join('\n');
-        // Enviar correo si hay documentos vencidos o por vencerse para el colaborador
-        console.log(`Documentos vencidos para ${correoElectronico}:`, mensajeVencidos);
-        console.log(`Documentos por vencerse para ${correoElectronico}:`, mensajePorVencerse);
-        console.log(hoy);
-        if (mensajeVencidos || mensajePorVencerse) {
-          mensaje += `<h2>Documentos vencidos y por vencerse</h2>
-          <table>
-            <tr>
-              <th>Documento</th>
-              <th>Estado</th>
-              <th>Tiempo Restante</th>
-            </tr>
-            ${mensajeVencidos}
-            ${mensajePorVencerse}
-          </table>`;
-          console.log("correos de documentos");
-          await enviarCorreo([correoElectronico], 'Documentos', mensaje, from); // Envío de correo dentro del bucle
-          mensaje = ``;
+        console.log(colaborador);
+        if(colaborador.estado == "Activo"){
+          const { idColaborador, correoElectronico } = colaborador;
+          // Obtener documentos del colaborador actual
+          const documentosColaborador = documentosPorColaborador[idColaborador] || [];
+          console.log("supuestamente correos: "+ documentosColaborador);
+          // Separar documentos vencidos y por vencerse
+          const documentosVencidos = documentosColaborador.filter(documento => vencidos.includes(documento));
+          const documentosPorVencerse = documentosColaborador.filter(documento => porVencerse.includes(documento));
+          // Crear mensaje para documentos vencidos y por vencerse del colaborador
+          const mensajeVencidos = documentosVencidos.map(documento => `<tr><td>El documento ${documento.nombreArchivo}  </td><td>está vencido  </td><td>diferencia de ${Math.floor(((new Date(documento.fechaVencimiento) - hoy.getTime())) / (1000 * 60 * 60 * 24))} dia(s)</td></tr>`).join('\n');
+          const mensajePorVencerse = documentosPorVencerse.map(documento => `<tr><td>El documento ${documento.nombreArchivo}</td> <td>está por vencerse</td><td>diferencia de ${Math.floor(((new Date(documento.fechaVencimiento) - hoy.getTime())) / (1000 * 60 * 60 * 24))} dia(s)</td></tr>`).join('\n');
+          // Enviar correo si hay documentos vencidos o por vencerse para el colaborador
+          console.log(`Documentos vencidos para ${correoElectronico}:`, mensajeVencidos);
+          console.log(`Documentos por vencerse para ${correoElectronico}:`, mensajePorVencerse);
+          console.log(hoy);
+          if (mensajeVencidos || mensajePorVencerse) {
+            mensaje += `<h2>Documentos vencidos y por vencerse</h2>
+            <table>
+              <tr>
+                <th>Documento</th>
+                <th>Estado</th>
+                <th>Tiempo Restante</th>
+              </tr>
+              ${mensajeVencidos}
+              ${mensajePorVencerse}
+            </table>`;
+            console.log("correos de documentos");
+            await enviarCorreo([correoElectronico], 'Documentos', mensaje, from); // Envío de correo dentro del bucle
+            mensaje = ``;
+          }
+        }else{
+          console.log(`No se envio el correo al colborador: ${colaborador.nombre} con el correo: ${colaborador.correoElectronico} por su estado: ${colaborador.estado}` );
         }
       }
     }
@@ -318,8 +326,8 @@ const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
   try {
       console.log("documentos");
       // Configurar la hora y el minuto deseados para enviar el correo
-      const horaDeseada = 10; // 03:00 AM la mejor hora para hacerlo
-      const minutoDeseado = 29;
+      const horaDeseada = 12; // 03:00 AM la mejor hora para hacerlo
+      const minutoDeseado = 38;
       // Ejecutar la función una vez al día a la hora deseada
       ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreos);
   } catch (error) {

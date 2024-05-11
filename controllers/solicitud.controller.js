@@ -33,7 +33,7 @@ exports.create = async (req, res, next) => {
       include: [{
         model: Colaborador,
         as: 'supervisor',
-        attributes: ['correoElectronico'],
+        attributes: ['correoElectronico', 'estado'],
       }],
     });
 
@@ -42,35 +42,41 @@ exports.create = async (req, res, next) => {
     console.log(colaborador.supervisor);
     const supervisorEmail = colaborador.supervisor ? colaborador.supervisor.correoElectronico : null;
     console.log(supervisorEmail);
-    const toList = [colaboradorEmail, supervisorEmail].filter(Boolean);
-    const subject = "Solicitud de nuevo colaborador";
-    const from = '"Se agregó como una nueva solicitud" <dgadeaio4@gmail.com>';
-    const htmlContent = `
-      <style>
-        h2 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f2f2f2; }
-      </style>
-      <h2>Informacion de la nueva solicitud</h2>
-      <table>
-        <tr><th>Información</th><th>Datos</th></tr>
-        <tr><td>Nombre del Colaborador:</td><td>${req.body.nombreColaborador}</td></tr>
-        <tr><td>Salario con goce:</td><td>${req.body.conGoceSalarial === 1 ? 'Sí' : 'No'}</td></tr>
-        <tr><td>Tipo de solicitud:</td><td>${req.body.tipoSolicitud}</td></tr>
-        <tr><td>Encargado:</td><td>${req.body.nombreEncargado}</td></tr>
-        <tr><td>Tiempo a solicitar:</td><td>${req.body.fechaInicio} - ${req.body.fechaFin}</td></tr>
-      </table>
-    `;
-    // Crear nueva solicitud
-    const data = await Solicitud.create({
-      ...req.body,
-      comprobante: buffer,
-      tamanio: length,
-      nombreArchivo: cadenaDecodificada,
-    });
-    // enviamos el correo despues de registrar la solicitud
-    await enviarCorreo(toList, subject, htmlContent, from);
+    if(colaborador.estado == 'Activo'){
+        const toList = [colaboradorEmail, supervisorEmail].filter(Boolean);
+        const subject = "Solicitud de nuevo colaborador";
+        const from = '"Se agregó como una nueva solicitud" <dgadeaio4@gmail.com>';
+        const htmlContent = `
+          <style>
+            h2 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+            th { background-color: #f2f2f2; }
+          </style>
+          <h2>Informacion de la nueva solicitud</h2>
+          <table>
+            <tr><th>Información</th><th>Datos</th></tr>
+            <tr><td>Nombre del Colaborador:</td><td>${req.body.nombreColaborador}</td></tr>
+            <tr><td>Salario con goce:</td><td>${req.body.conGoceSalarial === 1 ? 'Sí' : 'No'}</td></tr>
+            <tr><td>Tipo de solicitud:</td><td>${req.body.tipoSolicitud}</td></tr>
+            <tr><td>Encargado:</td><td>${req.body.nombreEncargado}</td></tr>
+            <tr><td>Tiempo a solicitar:</td><td>${req.body.fechaInicio} - ${req.body.fechaFin}</td></tr>
+          </table>
+        `;
+        // Crear nueva solicitud
+        const data = await Solicitud.create({
+          ...req.body,
+          comprobante: buffer,
+          tamanio: length,
+          nombreArchivo: cadenaDecodificada,
+        });
+        // enviamos el correo despues de registrar la solicitud
+        await enviarCorreo(toList, subject, htmlContent, from);
+      }else{
+        res.status(500).send({
+          message: err.message || "El colaborador al que le pertenece esta solicitud tiene un estado Inactivo.",
+        });
+      }
     // Enviar respuesta al cliente
     res.status(200).send({
       message: `Solicitud creada correctamente para ${req.body.nombreColaborador}`,
