@@ -323,3 +323,22 @@ function validarContrasena(contrasena) {
   );
 
 }
+
+exports.getAllSupervisors = (req, res) => {
+
+  Usuario.findAll({
+    where: {
+      rol: 'supervisor'
+    }
+  }).then((data) => {
+    if(data){
+      res.status(200).json({
+        data: data
+      });
+    }
+  }).catch((error)=> {
+    res.status(500).json({
+      message: error
+    });
+  });
+}
