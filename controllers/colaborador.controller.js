@@ -358,7 +358,7 @@
         try {
             // Configurar la hora y el minuto deseados para enviar el correo
             const horaDeseada = 12; // 03:00 AM la mejor hora para hacerlo
-            const minutoDeseado = 30;
+            const minutoDeseado = 40;
 
             // Ejecutar la función una vez al día a la hora deseada
             ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreoCumpleanieros);
