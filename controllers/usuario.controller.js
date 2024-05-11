@@ -187,7 +187,7 @@ exports.login = async (req, res,next) => {
     .then(async (usuario) => {
       if (!usuario) {
         req.exito = false;
-       
+        next();
 
         return res
           .status(401)
@@ -203,7 +203,7 @@ exports.login = async (req, res,next) => {
 
       if (!verificarContrasena) {
         req.exito = false;
-        
+        next();
         return res.status(401).json({ message: "Contraseña incorrecta" });
       }
 
