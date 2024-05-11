@@ -64,7 +64,7 @@ exports.uploadPdf = async (req, res) => {
                 curso: curso,
                 nombreArchivo: cadenaDecodificada,
                 archivo: buffer,
-                tamaño: length,
+                tamano: length,
                 fechaVencimiento: fechaVencimiento,
                 fechaSubida: getDateUploaded(),
                 idColaborador: idColaborador

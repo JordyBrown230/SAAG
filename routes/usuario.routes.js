@@ -25,4 +25,6 @@ router.put('/actualizar-usuario/:id', authenticateToken, authorizeRoles(['admin'
 
 router.delete('/eliminar-usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.delete);
 
+router.get('/supervisores', authenticateToken, authorizeRoles(['admin']), usuarioController.getAllSupervisors);
+
 module.exports = router;
