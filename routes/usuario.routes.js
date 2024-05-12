@@ -2,18 +2,11 @@ const express = require('express');
 const router = express.Router();
 const usuarioController = require('../controllers/usuario.controller');
 const { authenticateToken, authorizeRoles} = require('../middlewares/auth.middleware');
-const {auditLogin, auditLogout} = require('../middlewares/audit.middleware');
 
 router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) => {
   res.json({ message: 'Acceso permitido para el rol de administrador' });
 });
 
-// No necesita verificación
-router.post('/login/', usuarioController.login, auditLogin);
-
-router.post('/logout/:token',  usuarioController.logout, auditLogout);
-
-router.post('/refresh/:token',  usuarioController.refreshToken);
 
 router.post('/agregar-usuario/',  authenticateToken, authorizeRoles(['admin']), usuarioController.create);
 

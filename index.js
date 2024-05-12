@@ -24,6 +24,9 @@ app.use('/saag', require('./routes/expediente.routes'));
 app.use('/saag', require('./routes/documento.routes'));
 app.use('/saag', require('./routes/telefono.routes'));
 app.use(auditTables);
+
+app.use('/saag', require('./routes/login.routes'));
+
 // Sincroniza la base de datos
 db.sequelize.sync().then(() => {
   app.listen(PORT, () => {
