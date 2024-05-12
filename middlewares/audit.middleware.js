@@ -18,7 +18,7 @@ const auditTables = async (req, res, next) => {
 };
 
 const auditLogin = async (req, res) => {
-
+    console.log('entra aca');
 
     try{  
         const nombreUsuario =  req.body.nombreUsuario;
@@ -26,7 +26,7 @@ const auditLogin = async (req, res) => {
         const token = req.token;
         const direccionIp = req.ip || req.connection.remoteAddress;
         const agenteUsuario = req.get('user-agent') || 'unknown';
-             
+       console.log(exito);
         await createAuditLogin(req, res, nombreUsuario, exito, token, direccionIp, agenteUsuario);
 
     }catch(error) {

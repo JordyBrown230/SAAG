@@ -22,7 +22,7 @@ const AuditoriaLogin = db.auditoriaLogin;
           agenteUsuario
       })
       .then((data) => {
-  
+        return;
       })
       .catch((err) => {
         res.status(500).send({
