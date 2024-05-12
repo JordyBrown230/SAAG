@@ -3,9 +3,7 @@ const {createAuditLogin, updateAuditLogin} = require('../controllers/auditoriaLo
 
 
 const auditTables = async (req, res, next) => {
-        const url =req.originalUrl;
 
-        if(url !== "/login/"){
         try{       
             const datos = req.datos;
             const direccionIp = req.ip || req.connection.remoteAddress;
@@ -15,12 +13,10 @@ const auditTables = async (req, res, next) => {
         }catch(error) {
             console.error(error);
           }
-        }
     next();
 };
 
 const auditLogin = async (req, res) => {
-    console.log('entra aca');
 
     try{  
         const nombreUsuario =  req.body.nombreUsuario;
