@@ -162,7 +162,7 @@ exports.delete = (req, res, next) => {
     });
 };
 
-exports.login = async (req, res,next) => {
+exports.login = async (req, res) => {
   const { nombreUsuario, contrasena } = req.body;
 
   // Buscar el usuario por nombre de usuario
@@ -185,10 +185,10 @@ exports.login = async (req, res,next) => {
       },
     ], })
     .then(async (usuario) => {
-      if (!usuario) {
+      if (!usuario) {/*
         req.exito = false;
         next();
-
+*/
         return res
           .status(401)
           .json({ message: "Nombre de usuario inexistente" });
@@ -201,9 +201,9 @@ exports.login = async (req, res,next) => {
         usuario.contrasena
       );
 
-      if (!verificarContrasena) {
+      if (!verificarContrasena) {/*
         req.exito = false;
-        next();
+        next();*/
         return res.status(401).json({ message: "Contraseña incorrecta" });
       }
 
@@ -235,10 +235,10 @@ exports.login = async (req, res,next) => {
       const colaborador = usuario.colaborador;
       const supervisor = colaborador.supervisor; // Supervisor del usuario
       const nombreSupervisor = supervisor ? supervisor.nombre : null;
-
+/*
       req.exito = true;
       req.token = refreshToken;
-      next();
+      next();*/
 
       res.json({colaborador,supervisor:nombreSupervisor, accessToken, refreshToken});
     })

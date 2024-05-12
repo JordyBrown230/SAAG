@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const usuarioController = require('../controllers/usuario.controller');
-const {auditLogin, auditLogout} = require('../middlewares/audit.middleware');
+const {auditLogout} = require('../middlewares/audit.middleware');
 
-
-router.post('/login/', usuarioController.login, auditLogin);
+//auditLogin
+router.post('/login/', usuarioController.login);
 
 router.post('/logout/:token',  usuarioController.logout, auditLogout);
 
