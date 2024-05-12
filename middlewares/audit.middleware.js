@@ -3,7 +3,8 @@ const {createAuditLogin, updateAuditLogin} = require('../controllers/auditoriaLo
 
 
 const auditTables = async (req, res, next) => {
-
+        console.log('entra aqui');
+        console.log(req.originalUrl);
         try{       
             const datos = req.datos;
             const direccionIp = req.ip || req.connection.remoteAddress;
