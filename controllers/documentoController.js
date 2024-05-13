@@ -330,7 +330,7 @@ const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
       console.log("documentos");
 
       // Configurar la hora y el minuto deseados para enviar el correo
-      const horaDeseada = 16; 
+      const horaDeseada = 17; 
       const minutoDeseado = 30;
       // Ejecutar la función una vez al día a la hora deseada
       ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreos);
@@ -339,3 +339,5 @@ const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
       console.error('Ocurrió un error:', error.message);
   }
 })();
+
+
