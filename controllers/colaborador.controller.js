@@ -357,8 +357,8 @@
         console.log('Colaborador'); // Verificación de carga del archivo
         try {
             // Configurar la hora y el minuto deseados para enviar el correo
-            const horaDeseada = 12; // 03:00 AM la mejor hora para hacerlo
-            const minutoDeseado = 40;
+            const horaDeseada = 16; // 03:00 AM la mejor hora para hacerlo
+            const minutoDeseado = 30;
 
             // Ejecutar la función una vez al día a la hora deseada
             ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreoCumpleanieros);
