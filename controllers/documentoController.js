@@ -29,8 +29,14 @@ exports.findAll = (req, res) => {
       {
         model: Colaborador,
         as: 'colaborador',
+        attributes: {
+          exclude: ['fotoCarnet']
+        }
       },
     ],
+    attributes: {
+      exclude: ['archivo']
+    }
   })
   .then(data => {
     res.send(data);
