@@ -80,6 +80,11 @@
                 {
                     model: Puesto,
                     as: 'puesto',
+                },
+                {
+                    model: Colaborador,
+                    as: 'supervisor',
+                    required: false
                 }
             ]
         })
