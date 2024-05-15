@@ -1,7 +1,9 @@
 const transporter = require('../models/gmail');
+require('dotenv').config();
+
 // funcion global para enviar correos desde cualquier controller
-const enviarCorreo = async (toList, subject, htmlContent, fromt) => {
-    const from = fromt;  // este es el correo que envia ya que no tenemos uno de la empresa por ende es uno mio
+const enviarCorreo = async (toList, subject, htmlContent) => {
+    const from = { GM_MAIL } = process.env; 
     // Verifica si toList es una cadena (un solo correo) o una matriz (varios correos)
     const destinatarios = Array.isArray(toList) ? toList.join(', ') : toList;
     console.log(destinatarios);
@@ -19,3 +21,4 @@ const enviarCorreo = async (toList, subject, htmlContent, fromt) => {
 }
 
 module.exports = enviarCorreo;
+

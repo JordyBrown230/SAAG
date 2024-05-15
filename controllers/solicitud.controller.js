@@ -1,10 +1,10 @@
-const enviarCorreo = require("./gmail.controller"); // instancia de la funcion enviar correo
 const db = require("../models");
 const Solicitud = db.solicitud;
 const Colaborador = db.colaborador; // Import the Colaborador model if not already imported
-const multer = require("multer");
 const iconv = require("iconv-lite");
 const { getFileLength } = require("../mjs/functions");
+const emailController= require('./emails.controller');
+
 // Crea una nueva solicitud
 exports.create = async (req, res, next) => {
   try {
@@ -35,42 +35,7 @@ exports.create = async (req, res, next) => {
     if(req.body.horaFin === ''){
       req.body.horaFin = null;
     }
-
-    // Crea una nueva solicitud
-    // Obtener datos del colaborador y su supervisor
-    const colaborador = await Colaborador.findByPk(req.body.idColaborador, {
-      include: [{
-        model: Colaborador,
-        as: 'supervisor',
-        attributes: ['correoElectronico'],
-      }],
-    });
-
-    // Enviar correo electrónico a colaborador y supervisor
-    const colaboradorEmail = colaborador.correoElectronico;
-    console.log(colaborador.supervisor);
-    const supervisorEmail = colaborador.supervisor ? colaborador.supervisor.correoElectronico : null;
-    console.log(supervisorEmail);
-    const toList = [colaboradorEmail, supervisorEmail].filter(Boolean);
-    const subject = "Solicitud de nuevo colaborador";
-    const from = '"Se agregó como una nueva solicitud" <dgadeaio4@gmail.com>';
-    const htmlContent = `
-      <style>
-        h2 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f2f2f2; }
-      </style>
-      <h2>Informacion de la nueva solicitud</h2>
-      <table>
-        <tr><th>Información</th><th>Datos</th></tr>
-        <tr><td>Nombre del Colaborador:</td><td>${req.body.nombreColaborador}</td></tr>
-        <tr><td>Salario con goce:</td><td>${req.body.conGoceSalarial === 1 ? 'Sí' : 'No'}</td></tr>
-        <tr><td>Tipo de solicitud:</td><td>${req.body.tipoSolicitud}</td></tr>
-        <tr><td>Encargado:</td><td>${req.body.nombreEncargado}</td></tr>
-        <tr><td>Tiempo a solicitar:</td><td>${req.body.fechaInicio} - ${req.body.fechaFin}</td></tr>
-      </table>
-    `;
+    
     // Crear nueva solicitud
     const data = await Solicitud.create({
       ...req.body,
@@ -78,8 +43,8 @@ exports.create = async (req, res, next) => {
       tamanio: length,
       nombreArchivo: cadenaDecodificada,
     });
-    // enviamos el correo despues de registrar la solicitud
-    await enviarCorreo(toList, subject, htmlContent, from);
+    emailController.notificarSolicitud('nueva', data);
+
     // Enviar respuesta al cliente
     res.status(200).send({
       message: `Solicitud creada correctamente para ${req.body.nombreColaborador}`,
@@ -148,38 +113,6 @@ exports.findAllBySupervisor = (req, res, next) => {
     });
 };
 
-
-
-/**
- * 
-exports.findAllBySupervisor = (req, res, next) => {
-  const idSupervisor = req.params.id; // Supongamos que recibes el ID del supervisor desde el front-end
-
-  Solicitud.findAll({
-    include: [
-      {
-        model: Colaborador,
-        as: "colaborador",
-        attributes: {
-          exclude: ["fotoCarnet"],
-        },
-        where: {
-          idColaborador_fk: idSupervisor,
-        },
-      },
-    ],
-  })
-    .then((data) => {
-      console.log(data);
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Ocurrió un error al obtener las solicitudes.",
-      });
-    });
-};
- */
 
 // Obtiene una solicitud por ID
 exports.findOne = (req, res, next) => {
@@ -255,60 +188,7 @@ exports.update = (req, res, next) => {
               solicitud:solicitud
             }); 
             next();   
-            const from = '"Se ha Actualizado la Solicitud numero: "'+`${req.body.idSolicitud}`;
-            console.log(req.body.idColaborador);
-            const toList = [req.body.nombreColaborador];
-            const subject = "Actualizacion de solicitud";
-            const htmlContent = `
-                <style>
-                    h2 {
-                        color: #333;
-                        border-bottom: 2px solid #333;
-                        padding-bottom: 10px;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-top: 10px;
-                    }
-                    th, td {
-                        padding: 10px;
-                        text-align: left;
-                        border-bottom: 1px solid #ddd;
-                    }
-                    th {
-                        background-color: #f2f2f2;
-                    }
-                </style>
-                <h2>Informacion de la nueva solicitud</h2>
-                <table>
-                    <tr>
-                        <th>Información</th>
-                        <th>Datos</th>
-                    </tr>
-                    <tr>
-                        <td>nombre del Colaborador:</td>
-                        <td>${req.body.nombreColaborador}</td>
-                    </tr>
-                    <tr>
-                        <td>salario :</td>
-                        <td>${req.body.conGoceSalarial}</td>
-                    </tr>
-                    <tr>
-                        <td>Solicitud de tipo:</td>
-                        <td>${req.body.tipoSolicitud}</td>
-                    </tr>
-                    <tr>
-                        <td>Estado de la Solicitud:</td>
-                        <td>${req.body.estado}</td>
-                    </tr>
-                    <tr>
-                        <td>Tiempo:</td>
-                        <td>${req.body.fechaInicio} - ${req.body.fechaFin}</td>
-                    </tr>
-                </table>
-            `;
-            await enviarCorreo(toList, subject, htmlContent, from);
+            emailController.notificarSolicitud('actualizada', solicitud);
           })
           .catch((err) => {
             res.status(500).send({

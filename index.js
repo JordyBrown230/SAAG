@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const db = require('./models');
 const {auditTables} = require('./middlewares/audit.middleware');
+const emailController = require('./controllers/emails.controller');
+const cron = require('node-cron');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -29,6 +31,12 @@ app.use('/saag', require('./routes/login.routes'));
 
 // Sincroniza la base de datos
 db.sequelize.sync().then(() => {
+
+  cron.schedule('0 7 * * *', ()=> {  //7AM
+    emailController.notificarCumpleanios();
+    emailController.documentosPorVencer();
+  });
+
   app.listen(PORT, () => {
     console.log(`Servidor iniciado en el puerto ${PORT}`);
   });
@@ -36,6 +44,3 @@ db.sequelize.sync().then(() => {
 
 module.exports = app;
 
-//opciones de ejecucion
-// - node index.js
-// npx nodemon -> este actualiza los cambios sin tener que parar y levantar el server otra vez

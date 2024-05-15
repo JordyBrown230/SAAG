@@ -1,4 +1,3 @@
-const enviarCorreo = require('./gmail.controller') 
 const iconv = require('iconv-lite');
 const db = require('../models');
 const Colaborador = db.colaborador;
@@ -14,12 +13,14 @@ exports.getDocsEmployee = async (req, res) => {
     attributes: {
       exclude: ['archivo']
     }
-  }).then(documentos => {
-      res.status(200).send(documentos);
-  }).catch(error => {
-      res.status(500).send({
-        message: error
-      });
+  })
+  .then(documentos => {
+    res.status(200).send(documentos);
+  })
+  .catch(error => {
+    res.status(500).send({
+      message: error
+    });
   });
 };
 
@@ -190,154 +191,5 @@ exports.deleteDocumento = (req, res) => {
     });
   });
 }
-
-const obtenerColaboradores = async (identificadores) => {
-  try {
-    const colaboradores = await Colaborador.findAll({
-      where: {
-        idColaborador: {
-          [Op.in]: identificadores
-        }
-      },
-      attributes: ['idColaborador', 'correoElectronico'] // Seleccionar también el ID del colaborador
-    });
-    return colaboradores.map(colaborador => ({
-      idColaborador: colaborador.idColaborador,
-      correoElectronico: colaborador.correoElectronico
-    }));
-  } catch (error) {
-      console.error('Error al obtener colaboradores:', error.message);
-      return [];
-  }
-};
-
-const enviarCorreos = async () => {
-  const documentos = await Documento.findAll();
-  let mensaje = '';
-  const hoy = new Date();
-  // Verificar si no hay documentos
-  if (documentos.length === 0) {
-    console.log('No hay documentos para enviar correos.');
-  } else {
-    const vencidos = [];
-    const porVencerse = [];
-    // Filtro de documentos vencidos y por vencerse
-    documentos.forEach(documento => {
-      const vencimiento = new Date(documento.fechaVencimiento);
-      const diasRestantes = Math.floor((vencimiento - hoy) / (1000 * 60 * 60 * 24));
-      console.log(vencimiento + " " + hoy + " dias restantes = "+ diasRestantes);
-      console.log(`Documento: ${documento.nombreArchivo}, Fecha de vencimiento: ${vencimiento.toISOString()}, Días restantes: ${diasRestantes}`); // ya lo muestra
-      if (diasRestantes <= 0) {
-        vencidos.push(documento);
-      } else if (diasRestantes <= 90 && (diasRestantes % 90 === 0 || diasRestantes % 60 === 0 || diasRestantes === 15 || diasRestantes === 7 || diasRestantes === 2)) {
-        porVencerse.push(documento);
-      }
-    });
-    // Obtener correos de colaboradores
-    const idColaboradoresVencidos = vencidos.map(documento => documento.idColaborador);
-    const idColaboradoresPorVencerse = porVencerse.map(documento => documento.idColaborador);
-
-    const colaboradores = await obtenerColaboradores([...new Set([...idColaboradoresVencidos, ...idColaboradoresPorVencerse])]);
-    
-    // Verificar si hay correos para enviar
-    if (colaboradores.length === 0) {
-      console.log('No hay correos para enviar.');
-    } else {
-      const from = "Informacion relevante";
-      console.log("correo");
-      // Crear un mapa de documentos por ID de colaborador
-      const documentosPorColaborador = {};
-      documentos.forEach(documento => {
-        if (!documentosPorColaborador[documento.idColaborador]) {
-          documentosPorColaborador[documento.idColaborador] = [];
-        }
-        documentosPorColaborador[documento.idColaborador].push(documento);
-      });
-
-      for (const colaborador of colaboradores) {
-        const { idColaborador, correoElectronico } = colaborador;
-        // Obtener documentos del colaborador actual
-        const documentosColaborador = documentosPorColaborador[idColaborador] || [];
-        console.log("supuestamente correos: "+ documentosColaborador);
-        // Separar documentos vencidos y por vencerse
-        const documentosVencidos = documentosColaborador.filter(documento => vencidos.includes(documento));
-        const documentosPorVencerse = documentosColaborador.filter(documento => porVencerse.includes(documento));
-        // Crear mensaje para documentos vencidos y por vencerse del colaborador
-        const mensajeVencidos = documentosVencidos.map(documento => `<tr><td>El documento ${documento.nombreArchivo}  </td><td>está vencido  </td><td>diferencia de ${Math.floor(((new Date(documento.fechaVencimiento) - hoy.getTime())) / (1000 * 60 * 60 * 24))} dia(s)</td></tr>`).join('\n');
-        const mensajePorVencerse = documentosPorVencerse.map(documento => `<tr><td>El documento ${documento.nombreArchivo}</td> <td>está por vencerse</td><td>diferencia de ${Math.floor(((new Date(documento.fechaVencimiento) - hoy.getTime())) / (1000 * 60 * 60 * 24))} dia(s)</td></tr>`).join('\n');
-        // Enviar correo si hay documentos vencidos o por vencerse para el colaborador
-        console.log(`Documentos vencidos para ${correoElectronico}:`, mensajeVencidos);
-        console.log(`Documentos por vencerse para ${correoElectronico}:`, mensajePorVencerse);
-        console.log(hoy);
-        if (mensajeVencidos || mensajePorVencerse) {
-          mensaje += `<h2>Documentos vencidos y por vencerse</h2>
-          <table>
-            <tr>
-              <th>Documento</th>
-              <th>Estado</th>
-              <th>Tiempo Restante</th>
-            </tr>
-            ${mensajeVencidos}
-            ${mensajePorVencerse}
-          </table>`;
-          console.log("correos de documentos");
-          await enviarCorreo([correoElectronico], 'Documentos', mensaje, from); // Envío de correo dentro del bucle
-          mensaje = ``;
-        }
-      }
-    }
-  }
-
-  if (enviarCorreo) {
-    console.log('Correos enviados correctamente');
-  }
-};
-
-
-
-const ejecutarFuncionDiaria = (hora, minuto, funcion) => {
-  const ahora = new Date();
-  let horaDeseada = new Date(
-      ahora.getFullYear(),
-      ahora.getMonth(),
-      ahora.getDate(),
-      hora,
-      minuto,
-      0,
-      0
-  );
-
-  if (ahora > horaDeseada) {
-      // Si la hora deseada ya pasó hoy, programarla para mañana
-      horaDeseada.setDate(horaDeseada.getDate() + 1); // asignacion para el siguiente dia
-      console.log('Programar la siguiente ejecución para:', horaDeseada);
-  }
-
-  // Calcular el tiempo restante para la próxima ejecución
-  const tiempoParaEjecutar = horaDeseada - ahora;
-
-  // Programar la ejecución de la función usando setTimeout
-  setTimeout(() => {
-      funcion();
-      // Programar la siguiente ejecución para cierta hora
-      ejecutarFuncionDiaria(hora, minuto, funcion);
-  }, tiempoParaEjecutar);
-};
-
-// Función de autoejecución
-(async () => {
-  try {
-      console.log("documentos");
-
-      // Configurar la hora y el minuto deseados para enviar el correo
-      const horaDeseada = 17; 
-      const minutoDeseado = 30;
-      // Ejecutar la función una vez al día a la hora deseada
-      ejecutarFuncionDiaria(horaDeseada, minutoDeseado, enviarCorreos);
-
-  } catch (error) {
-      console.error('Ocurrió un error:', error.message);
-  }
-})();
 
 
