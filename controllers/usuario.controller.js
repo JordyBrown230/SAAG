@@ -81,54 +81,44 @@ exports.updateUsuario = async (req, res, next) => {
     });
   }
 
-  exports.updateUsuario = async (req, res) => {
-    const id = req.params.id;
-  
-    if (!req.body.nombreUsuario || !req.body.rol || !req.body.idColaborador) {
-      return res.status(400).send({
-        message: "Faltan campos requeridos.",
+  if (req.body.contrasena && !validarContrasena(req.body.contrasena)) {
+    return res.status(400).send({
+      message: "La contraseña no cumple con las reglas requeridas.",
+    });
+  }
+
+  try {
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) {
+      return res.status(404).send({
+        message: `No se encontró un usuario con ID ${id}`,
       });
     }
-  
-    if (req.body.contrasena && !validarContrasena(req.body.contrasena)) {
-      return res.status(400).send({
-        message: "La contraseña no cumple con las reglas requeridas.",
-      });
+
+    const updateData = {
+      nombreUsuario: req.body.nombreUsuario,
+      rol: req.body.rol,
+      idColaborador: req.body.idColaborador,
+    };
+
+    if (req.body.contrasena) {
+      updateData.contrasena = await bcrypt.hash(req.body.contrasena, 10);
     }
-  
-    try {
-      const usuario = await Usuario.findByPk(id);
-      if (!usuario) {
-        return res.status(404).send({
-          message: `No se encontró un usuario con ID ${id}`,
-        });
-      }
-  
-      const updateData = {
-        nombreUsuario: req.body.nombreUsuario,
-        rol: req.body.rol,
-        idColaborador: req.body.idColaborador,
-      };
-  
-      if (req.body.contrasena) {
-        updateData.contrasena = await bcrypt.hash(req.body.contrasena, 10);
-      }
-  
-      await usuario.update(updateData);
-  
-      res.status(200).send({
-        message: `Usuario con ID ${id} actualizado correctamente`,
-        usuario: usuario,
-      });
-  
-    } catch (err) {
-      console.error('Error en el proceso de actualización:', err);
-      return res.status(500).send({
-        message: `Ocurrió un error al actualizar el usuario con ID ${id}: ${err.message}`,
-      });
-    }
-  };
-}  
+
+    await usuario.update(updateData);
+
+    res.status(200).send({
+      message: `Actualizado correctamente el usuario con ID ${id}`,
+      usuario: usuario,
+    });
+
+  } catch (err) {
+    console.error('Error en el proceso de actualización:', err); // Agregamos un log para más detalle
+    return res.status(500).send({
+      message: `Ocurrió un error al actualizar el usuario con ID ${id}: ${err.message}`,
+    });
+  }
+};
 
 exports.deleteUsuario = (req, res, next) => {
   const id = req.params.id;
