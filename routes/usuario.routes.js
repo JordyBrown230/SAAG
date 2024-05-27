@@ -8,15 +8,15 @@ router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) =>
 });
 
 
-router.post('/agregar-usuario/',  authenticateToken, authorizeRoles(['admin']), usuarioController.create);
+router.post('/agregar-usuario/',  authenticateToken, authorizeRoles(['admin']), usuarioController.createUsuario);
 
-router.get('/usuarios/', authenticateToken, authorizeRoles(['admin']), usuarioController.findAll);
+router.get('/usuarios/', authenticateToken, authorizeRoles(['admin']), usuarioController.findAllUsuarios);
 
-router.get('/usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.findOne);
+router.get('/usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.findOneUsuario);
 
-router.put('/actualizar-usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.update);
+router.put('/actualizar-usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.updateUsuario);
 
-router.delete('/eliminar-usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.delete);
+router.delete('/eliminar-usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.deleteUsuario);
 
 router.get('/supervisores', authenticateToken, authorizeRoles(['admin']), usuarioController.getAllSupervisors);
 
