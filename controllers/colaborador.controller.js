@@ -113,6 +113,29 @@ exports.findOneColaborador = async (req, res) => {
     });
 };
 
+exports.findUsuarioByColaboradorId = async (req, res) => {
+    const idColaborador = req.params.idColaborador;
+
+    try {
+        const usuario = await Usuario.findOne({
+            where: { idColaborador: idColaborador }
+        });
+
+        if (!usuario) {
+            return res.status(404).send({
+                message: `No se encontró un usuario con idColaborador ${idColaborador}`
+            });
+        }
+
+        res.send(usuario);
+    } catch (err) {
+        res.status(500).send({
+            message: `Ocurrió un error al obtener el usuario con idColaborador ${idColaborador}: ${err.message}`
+        });
+    }
+};
+
+
 exports.updateColaborador = async (req, res,next) => {
     const id = req.params.id;
 

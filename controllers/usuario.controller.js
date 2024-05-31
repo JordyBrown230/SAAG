@@ -305,3 +305,32 @@ exports.getAllSupervisors = (req, res) => {
       res.status(500).json({ message: error });
     });
 };
+
+exports.verificarContrasena = async (req, res, next) => {
+  const { idUsuario, contrasenaActual } = req.body;
+
+  try {
+    const usuario = await Usuario.findByPk(idUsuario);
+    if (!usuario) {
+      return res.status(404).send({
+        message: `No se encontró un usuario con ID ${idUsuario}`,
+      });
+    }
+
+    const esContrasenaValida = await bcrypt.compare(contrasenaActual, usuario.contrasena);
+    if (!esContrasenaValida) {
+      return res.status(401).send({
+        message: "La contraseña actual es incorrecta",
+      });
+    }
+
+    res.status(200).send({
+      message: "La contraseña actual es correcta",
+    });
+  } catch (err) {
+    console.error('Error al verificar la contraseña:', err);
+    return res.status(500).send({
+      message: `Ocurrió un error al verificar la contraseña: ${err.message}`,
+    });
+  }
+};

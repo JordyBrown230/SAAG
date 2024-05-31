@@ -11,6 +11,8 @@ router.get('/colaboradores/', authenticateToken, authorizeRoles(['admin','superv
 
 router.get('/colaboradores-with-user/', authenticateToken, authorizeRoles(['admin']), colaboradorController.findAllColaboradoresWithUser);
 
+router.get('/find-user-by-IdColaborador/:idColaborador/usuario', authenticateToken, authorizeRoles(['admin','supervisor','empleado']), colaboradorController.findUsuarioByColaboradorId);
+
 router.delete('/eliminar-colaborador/:id', authenticateToken, authorizeRoles(['admin']), colaboradorController.deleteColaborador);
 
 router.get('/colaborador/:id', authenticateToken, authorizeRoles(['admin']), colaboradorController.findOneColaborador);

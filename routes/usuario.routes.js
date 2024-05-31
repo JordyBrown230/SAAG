@@ -10,6 +10,8 @@ router.get('/admin', authenticateToken, authorizeRoles(['admin']), (req, res) =>
 
 router.post('/agregar-usuario/',  authenticateToken, authorizeRoles(['admin']), usuarioController.createUsuario);
 
+router.post('/verificar-contrasena/',  authenticateToken, authorizeRoles(['admin','supervisor','empleado']), usuarioController.verificarContrasena);
+
 router.get('/usuarios/', authenticateToken, authorizeRoles(['admin']), usuarioController.findAllUsuarios);
 
 router.get('/usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.findOneUsuario);
