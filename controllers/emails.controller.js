@@ -16,22 +16,27 @@ const mesActual = fechaActual.getMonth() + 1;
 
 const destinatariosNoCumpleanios = async () => {
     try {
+        const diaActual = new Date().getDate();
+        const mesActual = new Date().getMonth() + 1;
+
         const response = await Colaborador.findAll({
             attributes: ['nombre', 'correoElectronico'],
             where: {
-                [Op.and]: [
+                [Op.or]: [
                     Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('fechaNacimiento')), { [Op.ne]: mesActual }),
                     Sequelize.where(Sequelize.fn('DAY', Sequelize.col('fechaNacimiento')), { [Op.ne]: diaActual })
                 ]
             }
         });
-        const destinatarios = response;
-        return destinatarios;
+
+        return response;
     } catch (error) {
         console.log(error);
         throw error; 
     }   
 };
+
+
 
 const destinatariosCumpleanios = async () => {
     try {
