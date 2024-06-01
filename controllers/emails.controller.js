@@ -259,3 +259,13 @@ const enviarDocumentosPorVencer = async (docs) => {
         console.error('Error al enviar el correo:', error);
     }
 };
+
+exports.obtenerImgCumpleanios = async (req, res) => {
+    const imagePath = path.join(__dirname, '../img', 'image1.png');
+    res.sendFile(imagePath);
+};
+
+exports.obtenerImg2 = async (req, res) => {
+    const imagePath = path.join(__dirname, '../img', 'image2.png');
+    res.sendFile(imagePath);
+};

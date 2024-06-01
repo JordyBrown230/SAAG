@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const colaboradorController = require('../controllers/colaborador.controller');
 const { authenticateToken, authorizeRoles } = require('../middlewares/auth.middleware');
+const { obtenerImg, obtenerImgCumpleanios, obtenerImg2 } = require('../controllers/emails.controller');
 
 router.post('/agregar-colaborador/', authenticateToken, authorizeRoles(['admin']), colaboradorController.createColaborador);
 
@@ -19,5 +20,10 @@ router.get('/colaborador/:id', authenticateToken, authorizeRoles(['admin']), col
 
 //especifica
 router.get('/colaboradores-usuarios/', authenticateToken, authorizeRoles(['admin']), colaboradorController.findColaboradoresSinUsuario);
+
+router.get('/imagen-cumpleanios/', obtenerImgCumpleanios);
+
+router.get('/imagen-fondo/', obtenerImg2);
+
 
 module.exports = router;
