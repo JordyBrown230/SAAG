@@ -65,7 +65,7 @@ exports.notificarCumpleanios = async () => {
                     nombres += ', ';
                 }
             });
-            noCumpleanieros.forEach(async(c) => {
+            noCumpleanieros.forEach(async (c) => {
                 const templatePath = path.join(__dirname, '../emailTemplates/emailNoCumpleTemplate.html');
                 const htmlTemplate = fs.readFileSync(templatePath, 'utf8');
                 const htmlContent = htmlTemplate.replace('{{ cumpleanieros }}', nombres)

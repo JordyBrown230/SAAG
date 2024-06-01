@@ -31,7 +31,8 @@ app.use('/saag', require('./routes/login.routes'));
 
 // Sincroniza la base de datos
 db.sequelize.sync().then(() => {
-
+  //*/5 * * * * *
+  //'0 7 * * *'
   cron.schedule('0 7 * * *', ()=> {  //7AM
     emailController.notificarCumpleanios();
     emailController.documentosPorVencer();
