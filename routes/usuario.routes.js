@@ -16,7 +16,7 @@ router.get('/usuarios/', authenticateToken, authorizeRoles(['admin']), usuarioCo
 
 router.get('/usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.findOneUsuario);
 
-router.put('/actualizar-usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.updateUsuario);
+router.put('/actualizar-usuario/:id', authenticateToken, authorizeRoles(['admin','supervisor','empleado']), usuarioController.updateUsuario);
 
 router.delete('/eliminar-usuario/:id', authenticateToken, authorizeRoles(['admin']), usuarioController.deleteUsuario);
 
